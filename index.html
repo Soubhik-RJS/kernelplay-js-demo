@@ -273,15 +273,13 @@
   <script type="module" src="./main.js"></script>
 
   <script>
-    setTimeout(() => {
-      // 2. Target your container
-    const container1 = document.getElementById('canvas-container');
-    const canvas = document.getElementsByTagName('canvas')[0];
-
-    // 3. Move the canvas into the container
-    // This works even if Pixi already attached it somewhere else!
-    container1.appendChild(canvas);
-    }, 100);
+    window.addEventListener('load', async () => {
+      setTimeout(() => {
+        const container1 = document.getElementById('canvas-container');
+        const canvas = document.getElementsByTagName('canvas')[0];
+        container1.appendChild(canvas);
+      }, 100);
+    })
   </script>
 </body>
 
