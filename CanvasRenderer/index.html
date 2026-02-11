@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KernelPlay Game Examples</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'game-primary': '#6366f1',
+            'game-secondary': '#8b5cf6',
+            'game-accent': '#ec4899',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      .game-shadow {
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+      }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/src/index.js"
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen overflow-hidden">
+
+  <div class="flex h-screen flex-col lg:flex-row">
+
+    <!-- Side Panel -->
+    <aside class="w-full lg:w-64 glass-effect border-r border-indigo-200 shadow-xl overflow-y-auto">
+      <div class="p-6">
+        <!-- Logo/Title -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            🎮 KernelPlay
+          </h1>
+          <p class="text-sm text-gray-600 mt-1">Game Engine Examples</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="space-y-2">
+          <a href="./"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg transform hover:scale-105 transition-all duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            <span class="font-medium">Canvas 2D</span>
+          </a>
+
+          <a href="./WebGL2D/"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 transform hover:scale-105 transition-all duration-200 hover:border-indigo-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+            <span class="font-medium">WebGL 2D</span>
+          </a>
+
+          <a href="./WebGL3D/"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 transform hover:scale-105 transition-all duration-200 hover:border-indigo-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="font-medium">Three.js 3D</span>
+          </a>
+        </nav>
+
+        <!-- Stats/Info Card -->
+        <div class="mt-8 p-4 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-200">
+          <h3 class="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Quick Info
+          </h3>
+          <p class="text-sm text-gray-700">
+            Interactive rendering examples using KernelPlay engine with multiple renderer backends.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+
+      <!-- Header -->
+      <header class="glass-effect border-b border-indigo-200 px-6 py-4 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Canvas 2D Renderer</h2>
+            <p class="text-sm text-gray-600">High-performance 2D graphics rendering</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div
+              class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
+              <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              Active
+            </div>
+            <button class="p-2 rounded-lg hover:bg-indigo-100 transition-colors" title="Settings">
+              <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Canvas Container -->
+      <div class="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-auto">
+        <div id="canvas-container"
+          class="game-shadow rounded-xl bg-white border-2 border-indigo-200 flex items-center justify-center">
+          <!-- Canvas will be appended here by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Info Footer -->
+      <footer class="glass-effect border-t border-indigo-200 px-6 py-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-indigo-100">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Renderer</p>
+              <p class="text-sm font-semibold text-gray-800">Canvas 2D</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-purple-100">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Resolution</p>
+              <p class="text-sm font-semibold text-gray-800">800 × 600</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-pink-100">
+              <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Performance</p>
+              <p class="text-sm font-semibold text-gray-800">60 FPS</p>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript for responsive canvas handling -->
+  <script>
+    const container = document.getElementById('canvas-container');
+
+    function adjustCanvasContainer() {
+      const canvas = container.querySelector('canvas');
+      if (canvas) {
+        // Set canvas display properties
+        canvas.style.display = 'block';
+        canvas.style.maxWidth = '100%';
+        canvas.style.height = 'auto';
+
+        // Get actual dimensions
+        const containerRect = container.parentElement.getBoundingClientRect();
+        const availableWidth = containerRect.width - 32; // Account for padding
+        const availableHeight = containerRect.height - 32;
+
+        const canvasWidth = 800;
+        const canvasHeight = 600;
+
+        // Calculate scale to fit container while maintaining aspect ratio
+        const scaleX = availableWidth / canvasWidth;
+        const scaleY = availableHeight / canvasHeight;
+        const scale = Math.min(scaleX, scaleY, 1); // Don't scale up, only down
+
+        if (scale < 1) {
+          canvas.style.width = `${canvasWidth * scale}px`;
+          canvas.style.height = `${canvasHeight * scale}px`;
+        } else {
+          canvas.style.width = `${canvasWidth}px`;
+          canvas.style.height = `${canvasHeight}px`;
+        }
+
+        // Ensure container can see the canvas
+        container.style.width = canvas.style.width;
+        container.style.height = canvas.style.height;
+      }
+    }
+
+    // Observe canvas addition with more aggressive checking
+    const observer = new MutationObserver((mutations) => {
+      for (let mutation of mutations) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          adjustCanvasContainer();
+        }
+      }
+    });
+
+    observer.observe(container, {
+      childList: true,
+      subtree: true,
+      attributes: true
+    });
+
+    // Also check periodically in case canvas is added before observer is ready
+    let checkCount = 0;
+    const checkInterval = setInterval(() => {
+      if (container.querySelector('canvas')) {
+        adjustCanvasContainer();
+        clearInterval(checkInterval);
+      }
+      checkCount++;
+      if (checkCount > 50) clearInterval(checkInterval); // Stop after 5 seconds
+    }, 100);
+
+    // Adjust on window resize
+    window.addEventListener('resize', adjustCanvasContainer);
+
+    // Initial adjustment
+    setTimeout(adjustCanvasContainer, 100);
+  </script>
+
+  <script type="module" src="./main.js"></script>
+
+  <script>
+    window.addEventListener('load', async () => {
+      setTimeout(() => {
+        const container1 = document.getElementById('canvas-container');
+        const canvas = document.getElementsByTagName('canvas')[0];
+        container1.appendChild(canvas);
+      }, 100);
+    })
+  </script>
+</body>
+
+</html>
