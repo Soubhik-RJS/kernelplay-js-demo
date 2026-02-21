@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Examples — KernelPlay.js</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(135deg,#0f0f1a 0%,#1a1033 50%,#0f1a1a 100%); min-height:100vh; margin:0; color:#f1f5f9; }
+    a { text-decoration:none; }
+
+    /* NAV */
+    nav { position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(10,10,25,.9); backdrop-filter:blur(16px); border-bottom:1px solid rgba(99,102,241,.2); }
+    .nav-inner { max-width:1400px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .gradient-text { background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .nav-link { color:#94a3b8; transition:color .2s; font-size:.9rem; }
+    .nav-link:hover, .nav-link.active { color:#a5b4fc; }
+
+    /* LAYOUT */
+    .main { padding:80px 24px 60px; max-width:1400px; margin:0 auto; }
+    .page-header { margin-bottom:32px; }
+    .page-header h1 { font-size:2.4rem; font-weight:800; margin:0 0 8px; }
+    .page-header p { color:#94a3b8; font-size:1rem; margin:0; }
+
+    /* TWO-COLUMN LAYOUT */
+    .demo-layout { display:grid; grid-template-columns:1fr 420px; gap:24px; align-items:start; }
+    @media (max-width: 1100px) { .demo-layout { grid-template-columns:1fr; } }
+
+    /* CANVAS SECTION */
+    .canvas-section { background:rgba(255,255,255,.04); border:1px solid rgba(99,102,241,.2); border-radius:20px; overflow:hidden; }
+    .canvas-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:rgba(0,0,0,.3); border-bottom:1px solid rgba(255,255,255,.06); }
+    .canvas-header h2 { margin:0; font-size:1rem; font-weight:700; color:#c7d2fe; }
+    .canvas-wrap { position:relative; }
+    canvas { display:block; width:100%; height:auto; }
+
+    /* TABS — TOP RIGHT of canvas header */
+    .tab-bar { display:flex; gap:6px; flex-wrap:wrap; }
+    .tab-btn {
+      padding:6px 14px; border-radius:8px; border:1px solid rgba(99,102,241,.3);
+      background:transparent; color:#94a3b8; font-size:.78rem; font-weight:600;
+      cursor:pointer; transition:all .2s; white-space:nowrap;
+    }
+    .tab-btn:hover { border-color:#6366f1; color:#a5b4fc; }
+    .tab-btn.active {
+      background:linear-gradient(135deg,#6366f1,#8b5cf6);
+      border-color:transparent; color:white;
+      box-shadow:0 2px 12px rgba(99,102,241,.4);
+    }
+
+    /* CODE PANEL */
+    .code-section { background:rgba(255,255,255,.03); border:1px solid rgba(99,102,241,.15); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; }
+    .code-section-header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:rgba(0,0,0,.25); border-bottom:1px solid rgba(255,255,255,.06); flex-shrink:0; }
+    .code-section-header h3 { margin:0; font-size:.9rem; font-weight:700; color:#c7d2fe; }
+    .code-panel { display:none; }
+    .code-panel pre { margin:0; max-height:430px; overflow-y:auto; font-size:.78rem; line-height:1.55; }
+    .code-panel pre code.hljs { background:transparent; padding:20px; }
+    .copy-code-btn {
+      padding:5px 12px; border-radius:6px; border:1px solid rgba(99,102,241,.35);
+      background:transparent; color:#94a3b8; font-size:.75rem; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:5px;
+    }
+    .copy-code-btn:hover { border-color:#6366f1; color:white; }
+
+    /* DEMO DESCRIPTIONS */
+    .demo-desc { padding:14px 20px; background:rgba(99,102,241,.06); border-top:1px solid rgba(255,255,255,.05); }
+    .demo-desc p { margin:0; color:#94a3b8; font-size:.85rem; line-height:1.5; }
+
+    /* BOTTOM CARDS */
+    .example-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:32px; }
+    .example-card { background:rgba(255,255,255,.04); border:1px solid rgba(99,102,241,.15); border-radius:14px; padding:20px; cursor:pointer; transition:all .2s; }
+    .example-card:hover { border-color:#6366f1; background:rgba(99,102,241,.08); transform:translateY(-2px); }
+    .example-card h4 { margin:0 0 6px; font-size:.95rem; font-weight:700; color:#e0e7ff; }
+    .example-card p { margin:0; font-size:.82rem; color:#64748b; line-height:1.5; }
+    .example-card .badge { display:inline-block; margin-top:10px; padding:2px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width:6px; height:6px; }
+    ::-webkit-scrollbar-track { background:rgba(0,0,0,.2); }
+    ::-webkit-scrollbar-thumb { background:#4f46e5; border-radius:3px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" style="display:flex;align-items:center;gap:10px;">
+      <div style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+        <span style="color:white;font-weight:800;font-size:1.1rem;">K</span>
+      </div>
+      <span class="gradient-text" style="font-size:1.1rem;font-weight:800;">KernelPlay.js</span>
+    </a>
+    <div style="display:flex;gap:28px;align-items:center;">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="docs.html" class="nav-link">Docs</a>
+      <a href="examples.html" class="nav-link active">Examples</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="https://github.com/Soubhik1000/kernelplay" target="_blank"
+         style="display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#c7d2fe;font-size:.85rem;font-weight:600;">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <h1 class="gradient-text">Live Examples</h1>
+    <p>Interactive demos with full source code. Switch tabs to explore each example.</p>
+  </div>
+
+  <div class="demo-layout">
+
+    <!-- ── CANVAS COLUMN ── -->
+    <div class="canvas-section">
+      <div class="canvas-header">
+        <h2>🎮 Live Preview</h2>
+        <!-- TAB SWITCHER — TOP RIGHT -->
+        <div class="tab-bar">
+          <button class="tab-btn" data-tab="bouncing" onclick="switchTab('bouncing')">⚽ Bouncing</button>
+          <button class="tab-btn" data-tab="platformer" onclick="switchTab('platformer')">🏃 Platformer</button>
+          <button class="tab-btn" data-tab="particles" onclick="switchTab('particles')">✨ Particles</button>
+          <button class="tab-btn" data-tab="triggers" onclick="switchTab('triggers')">🔲 Triggers</button>
+          <button class="tab-btn" data-tab="gravity" onclick="switchTab('gravity')">🪐 Gravity</button>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="demo-canvas" width="800" height="360"></canvas>
+      </div>
+      <div class="demo-desc">
+        <p id="demo-description">Bouncing balls demonstrating basic physics — velocity, boundary collision, and render components.</p>
+      </div>
+    </div>
+
+    <!-- ── CODE COLUMN ── -->
+    <div class="code-section">
+      <div class="code-section-header">
+        <h3>📄 Source Code</h3>
+        <button class="copy-code-btn" id="copy-active-btn" onclick="copyActiveCode()">
+          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+          Copy
+        </button>
+      </div>
+
+      <!-- Bouncing -->
+      <div id="code-bouncing" class="code-panel">
+        <pre><code class="language-js">import { Game, Scene, Entity } from "kernelplay-js";
+import { TransformComponent, CircleRenderComponent,
+         Rigidbody2DComponent } from "kernelplay-js";
+
+class BallScene extends Scene {
+  init() {
+    for (let i = 0; i < 18; i++) {
+      const ball = new Entity(`Ball_${i}`);
+      const r = Math.random() * 18 + 14;
+
+      ball.addComponent("transform", new TransformComponent({
+        position: {
+          x: Math.random() * 760 + 20,
+          y: Math.random() * 280 + 40,
+        }
+      }));
+
+      ball.addComponent("renderer", new CircleRenderComponent({
+        radius: r,
+        color: `hsl(${Math.random()*360},70%,60%)`
+      }));
+
+      // Rigidbody with boundary bounce
+      ball.addComponent("rigidbody2d", new Rigidbody2DComponent({
+        velocity: {
+          x: (Math.random() - 0.5) * 400,
+          y: (Math.random() - 0.5) * 400,
+        },
+        useGravity: false,
+        bounceWalls: true,  // built-in boundary bounce
+      }));
+
+      this.addEntity(ball);
+    }
+  }
+}
+
+class BouncingGame extends Game {
+  init() {
+    const scene = new BallScene("Bounce");
+    this.sceneManager.addScene(scene);
+    this.sceneManager.startScene("Bounce");
+  }
+}
+
+new BouncingGame({
+  width: 800, height: 360, fps: 60
+}).start();</code></pre>
+      </div>
+
+      <!-- Platformer -->
+      <div id="code-platformer" class="code-panel">
+        <pre><code class="language-js">import { Game, Scene, Entity, ScriptComponent } from "kernelplay-js";
+import { TransformComponent, BoxRenderComponent,
+         Rigidbody2DComponent, ColliderComponent,
+         Keyboard } from "kernelplay-js";
+
+class PlayerController extends ScriptComponent {
+  onStart() {
+    this.rb = this.entity.getComponent("rigidbody2d");
+    this.grounded = false;
+    this.speed = 220;
+  }
+
+  update(dt) {
+    // Horizontal
+    if (Keyboard.isPressed("ArrowRight"))
+      this.rb.velocity.x = this.speed;
+    else if (Keyboard.isPressed("ArrowLeft"))
+      this.rb.velocity.x = -this.speed;
+    else
+      this.rb.velocity.x *= 0.75;
+
+    // Jump
+    if (Keyboard.wasPressed("Space") && this.grounded) {
+      this.rb.velocity.y = -420;
+      this.grounded = false;
+    }
+  }
+
+  onCollision(other) {
+    if (other.tag === "platform") this.grounded = true;
+  }
+}
+
+class PlatformerScene extends Scene {
+  init() {
+    // Ground
+    this.createPlatform(0, 320, 800, 20, "ground");
+
+    // Floating platforms
+    [[100,240],[300,190],[480,150],[640,220]].forEach(([x, y]) => {
+      this.createPlatform(x, y, 100, 14, "platform");
+    });
+
+    // Player
+    const player = new Entity("Player");
+    player.addComponent("transform", new TransformComponent({
+      position: { x: 80, y: 100 }
+    }));
+    player.addComponent("renderer", new BoxRenderComponent("#6366f1", 28, 36));
+    player.addComponent("rigidbody2d", new Rigidbody2DComponent({
+      useGravity: true, mass: 1, drag: 0.02
+    }));
+    player.addComponent("collider", new ColliderComponent({ width:28, height:36 }));
+    player.addComponent("script", new PlayerController());
+    this.addEntity(player);
+  }
+
+  createPlatform(x, y, w, h, tag) {
+    const p = new Entity(tag);
+    p.tag = tag;
+    p.addComponent("transform", new TransformComponent({ position: { x, y } }));
+    p.addComponent("renderer", new BoxRenderComponent("#4f46e5", w, h));
+    p.addComponent("collider", new ColliderComponent({ width: w, height: h }));
+    this.addEntity(p);
+  }
+}</code></pre>
+      </div>
+
+      <!-- Particles -->
+      <div id="code-particles" class="code-panel">
+        <pre><code class="language-js">import { Game, Scene, Entity, ScriptComponent } from "kernelplay-js";
+import { TransformComponent, Mouse } from "kernelplay-js";
+import { ParticleEmitterComponent } from "kernelplay-js";
+
+class ParticleScene extends Scene {
+  init() {
+    // Orbiting emitters
+    const colors = ["#6366f1", "#ec4899", "#fbbf24"];
+    colors.forEach((color, i) => {
+      const emitter = new Entity(`Emitter_${i}`);
+      emitter.addComponent("transform", new TransformComponent({
+        position: { x: 400, y: 240 }
+      }));
+      emitter.addComponent("particles", new ParticleEmitterComponent({
+        color,
+        rate: 20,
+        speed: { min: 40, max: 180 },
+        lifetime: { min: 0.6, max: 1.4 },
+        size: { min: 2, max: 7 },
+        gravity: 120,
+        spread: Math.PI * 2,
+      }));
+      emitter.addComponent("script", new class extends ScriptComponent {
+        update(dt) {
+          const t = this.entity.scene.time;
+          const tf = this.entity.getComponent("transform");
+          tf.position.x = 400 + Math.cos(t*.8 + i*2.1) * 240;
+        }
+      }());
+      this.addEntity(emitter);
+    });
+
+    // Mouse-follow emitter
+    const mouseEmitter = new Entity("MouseEmitter");
+    mouseEmitter.addComponent("transform", new TransformComponent());
+    mouseEmitter.addComponent("particles", new ParticleEmitterComponent({
+      color: "white", rate: 30, speed: { min: 60, max: 200 },
+      lifetime: { min: 0.4, max: 1 }, size: { min: 2, max: 5 },
+    }));
+    mouseEmitter.addComponent("script", new class extends ScriptComponent {
+      update() {
+        const tf = this.entity.getComponent("transform");
+        tf.position.x = Mouse.x;
+        tf.position.y = Mouse.y;
+      }
+    }());
+    this.addEntity(mouseEmitter);
+  }
+}</code></pre>
+      </div>
+
+      <!-- Triggers -->
+      <div id="code-triggers" class="code-panel">
+        <pre><code class="language-js">import { Game, Scene, Entity, ScriptComponent } from "kernelplay-js";
+import { TransformComponent, BoxRenderComponent,
+         Rigidbody2DComponent, ColliderComponent } from "kernelplay-js";
+
+// Zone component — responds to trigger events
+class ZoneEffect extends ScriptComponent {
+  constructor(effect) { super(); this.effect = effect; }
+
+  onTriggerEnter(other) {
+    if (other.tag !== "player") return;
+    console.log(`Entered: ${this.entity.name}`);
+
+    const rb = other.getComponent("rigidbody2d");
+    if (this.effect === "heal") {
+      GameState.health = Math.min(100, GameState.health + 15);
+    } else if (this.effect === "damage") {
+      GameState.health = Math.max(0, GameState.health - 20);
+    } else if (this.effect === "speed") {
+      rb.velocity.x = 200;
+      setTimeout(() => rb.velocity.x = 90, 1500);
+    }
+  }
+
+  onTriggerExit(other) {
+    console.log(`Left: ${this.entity.name}`);
+  }
+}
+
+class TriggerScene extends Scene {
+  init() {
+    this.addZone(150, 100, 120, 100, "green", "heal", "Heal Zone");
+    this.addZone(380, 130, 110, 90, "red", "damage", "Damage Zone");
+    this.addZone(600, 100, 130, 110, "orange", "speed", "Speed Zone");
+
+    const player = new Entity("Player");
+    player.tag = "player";
+    player.addComponent("transform", new TransformComponent({
+      position: { x: 60, y: 160 }
+    }));
+    player.addComponent("renderer", new BoxRenderComponent("#6366f1", 28, 28));
+    player.addComponent("rigidbody2d", new Rigidbody2DComponent({
+      velocity: { x: 90, y: 0 }, useGravity: false
+    }));
+    player.addComponent("collider", new ColliderComponent({
+      width: 28, height: 28
+    }));
+    this.addEntity(player);
+  }
+
+  addZone(x, y, w, h, color, effect, name) {
+    const zone = new Entity(name);
+    zone.addComponent("transform", new TransformComponent({ position:{x,y} }));
+    zone.addComponent("renderer", new BoxRenderComponent(color, w, h));
+    zone.addComponent("collider", new ColliderComponent({
+      width: w, height: h, isTrigger: true  // ← trigger!
+    }));
+    zone.addComponent("script", new ZoneEffect(effect));
+    this.addEntity(zone);
+  }
+}</code></pre>
+      </div>
+
+      <!-- Gravity -->
+      <div id="code-gravity" class="code-panel">
+        <pre><code class="language-js">import { Game, Scene, Entity, ScriptComponent } from "kernelplay-js";
+import { TransformComponent, CircleRenderComponent, Mouse } from "kernelplay-js";
+
+const G = 6000;
+
+class GravityBody extends ScriptComponent {
+  constructor(mass, fixed = false) {
+    super();
+    this.mass = mass;
+    this.fixed = fixed;
+    this.vx = 0; this.vy = 0;
+  }
+
+  update(dt) {
+    if (this.fixed) return;
+    const bodies = this.entity.scene.findEntitiesByTag("body");
+    let ax = 0, ay = 0;
+
+    for (const other of bodies) {
+      if (other === this.entity) continue;
+      const tf  = this.entity.getComponent("transform");
+      const otf = other.getComponent("transform");
+      const dx = otf.position.x - tf.position.x;
+      const dy = otf.position.y - tf.position.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) + 0.1;
+      const otherScript = other.getComponent("gravity");
+      const f = G * otherScript.mass / (dist * dist);
+      ax += (dx / dist) * f;
+      ay += (dy / dist) * f;
+    }
+
+    const tf = this.entity.getComponent("transform");
+    this.vx += ax * dt;
+    this.vy += ay * dt;
+    tf.position.x += this.vx * dt;
+    tf.position.y += this.vy * dt;
+  }
+}
+
+class GravityScene extends Scene {
+  init() {
+    // Sun
+    this.spawnBody(400, 240, 22, 6000, true, "#fbbf24");
+
+    // Click to add bodies
+    this.on("click", (mx, my) => {
+      const cx = 400, cy = 240;
+      const dx = mx - cx, dy = my - cy;
+      const d = Math.sqrt(dx*dx+dy*dy) || 1;
+      const orbitSpeed = Math.sqrt(G * 6000 / d) * 0.85;
+      this.spawnBody(mx, my, 6, 100, false, randomColor(), {
+        vx: -(dy/d) * orbitSpeed,
+        vy:  (dx/d) * orbitSpeed,
+      });
+    });
+  }
+
+  spawnBody(x, y, r, mass, fixed, color, vel = {vx:0,vy:0}) {
+    const e = new Entity("body");
+    e.tag = "body";
+    e.addComponent("transform", new TransformComponent({ position:{x,y} }));
+    e.addComponent("renderer", new CircleRenderComponent({ radius:r, color }));
+    const script = new GravityBody(mass, fixed);
+    script.vx = vel.vx || 0;
+    script.vy = vel.vy || 0;
+    e.addComponent("gravity", script);
+    this.addEntity(e);
+  }
+}</code></pre>
+      </div>
+    </div><!-- /code-section -->
+
+  </div><!-- /demo-layout -->
+
+  <!-- DEMO CARDS -->
+  <h2 style="font-size:1.4rem;font-weight:800;margin:40px 0 16px;color:#e0e7ff;">More Examples</h2>
+  <div class="example-cards">
+    <div class="example-card" onclick="switchTab('bouncing')">
+      <h4>⚽ Bouncing Balls</h4>
+      <p>Velocity, boundary collisions, and CircleRenderComponent in action.</p>
+      <span class="badge" style="background:#1e1b4b;color:#a5b4fc;">Physics</span>
+    </div>
+    <div class="example-card" onclick="switchTab('platformer')">
+      <h4>🏃 Platformer</h4>
+      <p>Keyboard input, gravity, Rigidbody2D, collisions, and coin collection.</p>
+      <span class="badge" style="background:#14532d;color:#86efac;">Input + Physics</span>
+    </div>
+    <div class="example-card" onclick="switchTab('particles')">
+      <h4>✨ Particle System</h4>
+      <p>Multi-emitter particles with gravity, lifetime, mouse interaction.</p>
+      <span class="badge" style="background:#4a1d96;color:#ddd6fe;">VFX</span>
+    </div>
+    <div class="example-card" onclick="switchTab('triggers')">
+      <h4>🔲 Trigger Zones</h4>
+      <p>onTriggerEnter / onTriggerExit callbacks for pickups and zone effects.</p>
+      <span class="badge" style="background:#7f1d1d;color:#fca5a5;">Triggers</span>
+    </div>
+    <div class="example-card" onclick="switchTab('gravity')">
+      <h4>🪐 N-Body Gravity</h4>
+      <p>Gravitational simulation — click to spawn orbiting bodies.</p>
+      <span class="badge" style="background:#1c1917;color:#fde68a;">Simulation</span>
+    </div>
+    <div class="example-card" onclick="window.open('https://soubhik-rjs.github.io/kernelplay-js-demo/','_blank')">
+      <h4>🌐 Full Demo Site</h4>
+      <p>See the complete demo app built with KernelPlay.js on GitHub Pages.</p>
+      <span class="badge" style="background:#0c4a6e;color:#7dd3fc;">External →</span>
+    </div>
+  </div>
+</div><!-- /main -->
+
+<footer style="background:rgba(0,0,0,.4);border-top:1px solid rgba(99,102,241,.15);padding:32px 24px;text-align:center;margin-top:60px;">
+  <p style="margin:0;color:#475569;font-size:.85rem;">© 2026 KernelPlay.js · Built by Soubhik Mukherjee · MIT License</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+// Descriptions per tab
+const DESCRIPTIONS = {
+  bouncing:   "Bouncing balls demonstrating basic physics — velocity, boundary collision, and render components.",
+  platformer: "Platformer with keyboard input, gravity, Rigidbody2D, platform collision detection, and coin collecting. Use arrow keys + Space.",
+  particles:  "Multi-emitter particle system with GPU-style VFX. Emitters orbit autonomously. Move mouse over the canvas to emit white particles.",
+  triggers:   "Trigger zone demo — shows onTriggerEnter / onTriggerExit events. The player bounces between zones picking up heal, damage, and speed effects.",
+  gravity:    "N-body gravitational simulation. Bodies orbit the central sun. Click anywhere on the canvas to spawn a new orbiting body.",
+};
+
+function updateDescription(id) {
+  document.getElementById("demo-description").textContent = DESCRIPTIONS[id] || "";
+}
+
+// Override switchTab to also update description
+const _origSwitch = window.switchTab;
+
+function copyActiveCode() {
+  const active = document.querySelector(".tab-btn.active");
+  const tabId = active ? active.dataset.tab : "bouncing";
+  const panel = document.getElementById("code-" + tabId);
+  if (!panel) return;
+  const text = panel.querySelector("code").innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copy-active-btn");
+    btn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Copied!`;
+    btn.style.color = "#86efac";
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg> Copy`;
+      btn.style.color = "";
+    }, 2000);
+  });
+}
+</script>
+<script src="examples.js"></script>
+<script>
+// Patch switchTab to update description after it runs
+const _baseSwitchTab = switchTab;
+window.switchTab = function(id) {
+  _baseSwitchTab(id);
+  updateDescription(id);
+  // Re-highlight code panels
+  document.querySelectorAll(".code-panel pre code").forEach(el => {
+    if (!el.dataset.highlighted) hljs.highlightElement(el);
+  });
+};
+// Re-init
+document.addEventListener("DOMContentLoaded", () => {
+  switchTab("bouncing");
+});
+</script>
+</body>
+</html>

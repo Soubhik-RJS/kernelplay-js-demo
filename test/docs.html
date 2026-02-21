@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Documentation — KernelPlay.js</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+  <style>
+    body { font-family:'Segoe UI',system-ui,sans-serif; background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 50%,#fdf2f8 100%); min-height:100vh; margin:0; }
+    .glass { background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); }
+    .gradient-text { background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(255,255,255,.95); backdrop-filter:blur(10px); border-bottom:1px solid #e0e7ff; box-shadow:0 2px 16px rgba(99,102,241,.08); }
+    .nav-inner { max-width:1280px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:64px; }
+    a { text-decoration:none; }
+    .doc-card { background:white; border:2px solid #e0e7ff; border-radius:16px; padding:28px; transition:all .2s; cursor:pointer; }
+    .doc-card:hover { border-color:#6366f1; box-shadow:0 8px 30px rgba(99,102,241,.15); transform:translateY(-2px); }
+    .doc-card h3 { font-size:1.15rem; font-weight:700; color:#111827; margin:0 0 8px; }
+    .doc-card p { font-size:0.875rem; color:#6b7280; margin:0 0 16px; line-height:1.5; }
+    .doc-card .go { font-size:0.8rem; font-weight:700; color:#6366f1; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="index.html" style="display:flex;align-items:center;gap:8px;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+          <span style="color:white;font-weight:800;font-size:1.2rem;">K</span>
+        </div>
+        <span class="gradient-text" style="font-size:1.2rem;font-weight:800;">KernelPlay.js</span>
+      </a>
+      <div style="display:flex;gap:32px;align-items:center;">
+        <a href="index.html" style="color:#6b7280;transition:color .2s;">Home</a>
+        <a href="docs.html" style="color:#6366f1;font-weight:700;">Docs</a>
+        <a href="examples.html" style="color:#6b7280;transition:color .2s;">Examples</a>
+        <a href="about.html" style="color:#6b7280;transition:color .2s;">About</a>
+        <a href="https://github.com/Soubhik1000/kernelplay" target="_blank" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#111827;color:white;font-size:0.85rem;font-weight:600;">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div style="max-width:1100px;margin:0 auto;padding:100px 24px 60px;">
+    <div style="text-align:center;margin-bottom:60px;">
+      <h1 style="font-size:3rem;font-weight:800;" class="gradient-text">Documentation</h1>
+      <p style="color:#6b7280;font-size:1.15rem;margin-top:12px;">Everything you need to build games with KernelPlay.js</p>
+      <a href="getting-started.html" style="display:inline-block;margin-top:24px;padding:14px 32px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;font-weight:700;font-size:1rem;">
+        Get Started →
+      </a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+      <a href="getting-started.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🚀</div>
+        <h3>Getting Started</h3>
+        <p>Install the library and build your first game. npm, CDN, and basic setup.</p>
+        <span class="go">Read guide →</span>
+      </a>
+      <a href="core-concepts.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🧠</div>
+        <h3>Core Concepts</h3>
+        <p>Game, Scene, Entity, Component — the four pillars of KernelPlay.js architecture.</p>
+        <span class="go">Learn more →</span>
+      </a>
+      <a href="components.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🔧</div>
+        <h3>Components</h3>
+        <p>Transform, Collider, Rigidbody2D, BoxRenderer, and ScriptComponent.</p>
+        <span class="go">View components →</span>
+      </a>
+      <a href="renderers.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🎨</div>
+        <h3>Renderers</h3>
+        <p>Canvas 2D, WebGL 2D, and Three.js 3D rendering backends.</p>
+        <span class="go">Choose renderer →</span>
+      </a>
+      <a href="physics.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">⚙️</div>
+        <h3>Physics</h3>
+        <p>Gravity, velocity, collision detection, triggers, and rigidbodies.</p>
+        <span class="go">Explore physics →</span>
+      </a>
+      <a href="input.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🎮</div>
+        <h3>Input System</h3>
+        <p>Keyboard, mouse, gamepad, and raycast picking from scripts.</p>
+        <span class="go">Handle input →</span>
+      </a>
+      <a href="lifecycle.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">🔄</div>
+        <h3>Script Lifecycle</h3>
+        <p>onAttach, onStart, update, lateUpdate, onCollision, onDestroy.</p>
+        <span class="go">View lifecycle →</span>
+      </a>
+      <a href="api.html" class="doc-card">
+        <div style="font-size:2rem;margin-bottom:12px;">📖</div>
+        <h3>API Reference</h3>
+        <p>Complete method tables for Entity, Scene, SceneManager, and more.</p>
+        <span class="go">See API →</span>
+      </a>
+      <a href="examples.html" class="doc-card" style="border-color:#ddd6fe;background:linear-gradient(135deg,#f5f3ff,#fdf2f8);">
+        <div style="font-size:2rem;margin-bottom:12px;">▶️</div>
+        <h3>Live Examples</h3>
+        <p>Interactive canvas demos with full code — platformer, bouncing balls, triggers, and more.</p>
+        <span class="go">Try examples →</span>
+      </a>
+    </div>
+  </div>
+
+  <footer style="background:#111827;color:#9ca3af;padding:40px 24px;text-align:center;margin-top:60px;">
+    <p style="margin:0;font-size:0.875rem;">© 2026 KernelPlay.js. Built with ❤️ by Soubhik Mukherjee. Licensed under MIT.</p>
+  </footer>
+</body>
+</html>
