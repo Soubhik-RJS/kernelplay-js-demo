@@ -169,7 +169,7 @@
           <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Renderer</h3>
           <nav class="space-y-2">
             <a href="../Canvas2D/" 
-               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
+               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
@@ -185,7 +185,7 @@
             </a>
             
             <a href="../THREE3D/" 
-               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
+               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
@@ -250,7 +250,7 @@
             Interactive rendering examples using KernelPlay engine with multiple renderer backends.
           </p>
         </div>
-
+        
       </div>
     </aside>
     
@@ -261,8 +261,8 @@
       <header class="z-10 glass-effect border-b border-indigo-200 px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">Canvas 2D Renderer</h2>
-            <p class="text-sm text-gray-600">High-performance 2D graphics rendering</p>
+            <h2 class="text-xl font-bold text-gray-800">Three.js 3D Renderer</h2>
+            <p class="text-sm text-gray-600">High-performance 3D graphics rendering</p>
           </div>
           <div class="flex items-center gap-3">
             <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
@@ -348,13 +348,13 @@
               scenes/Level1.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="player">
-              prefabs/Player.js
+              prefabs/PlayerCube.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="box">
-              prefabs/Box.js
+              prefabs/Cube.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="playercontroller">
-              script/PlayerController.js
+              script/CubeScript.js
             </button>
             
           </div>
@@ -370,6 +370,7 @@
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
 import { Level1 } from "./scenes/Level1.js";
+import { ThreeRenderer } from "kernelplay-js";
 
 class MyGame extends Game {
   init() {
@@ -379,6 +380,7 @@ class MyGame extends Game {
 }
 
 const game = new MyGame({
+  renderer: new ThreeRenderer(),
   width: 800,
   height: 600,
   fps: 60
@@ -401,7 +403,7 @@ game.start();</code></pre>
   &lt;title&gt;KernelPlay Game&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
- &lt;script type="importmap"&gt;
+  &lt;script type="importmap"&gt;
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
@@ -429,14 +431,14 @@ game.start();</code></pre>
                 </button>
               </div>
               <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene } from "kernelplay-js";
-import { Player } from "../prefabs/Player.js";
-import { Box } from "../prefabs/Box.js";
+import { PlayerCube } from "../prefabs/PlayerCube.js";
+import { Cube } from "../prefabs/Cube.js";
 
 export class Level1 extends Scene {
   init() {
-    this.addEntity(new Player(400, 300));
-    this.addEntity(new Box(500, 300));
-    this.addEntity(new Box(300, 300, true));
+    this.addEntity(new PlayerCube(0, 0, 0));
+    this.addEntity(new Cube(3, 0, 0));
+    this.addEntity(new Cube(-3, 0, 0, true));
   }
 }</code></pre>
             </div>
@@ -448,34 +450,39 @@ export class Level1 extends Scene {
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="player-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-    Rigidbody2DComponent
-} from "kernelplay-js";
+              <pre class="p-4"><code id="player-code" class="language-javascript">import * as THREE from "three";
+import { Entity, ColliderComponent } from "kernelplay-js";
+import { CubeScript } from "../scripts/CubeScript.js";
 
-import { PlayerController } from "../scripts/PlayerController.js";
 import { Layers } from "kernelplay-js";
 
-export class Player extends Entity {
-    constructor(x, y) {
-        super("Player");
+import { MeshComponent } from "kernelplay-js";
+import { BoxCollider3D } from "kernelplay-js";
+import { TransformComponent } from "kernelplay-js";
+import { RigidbodyComponent } from "kernelplay-js";
 
-        this.layer = Layers.Player;
-        this.tag = "player"
+export function PlayerCube(x, y, z = 0) {
+  const e = new Entity("Player");
+  e.layer = Layers.Player;
 
-        this.addComponent("transform", new TransformComponent({
-            position: { x, y },
-        }));
-        this.addComponent("rigidbody2d",new Rigidbody2DComponent({
-            useGravity: false
-        }));
-        this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new BoxRenderComponent("red"));
-        this.addComponent("playerController", new PlayerController());
-    }
+  e.addComponent("transform", new TransformComponent({
+    position: { x, y, z},
+    scale: { x: 1, y: 1, z: 1}
+  }));
+
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshStandardMaterial({ color: "blue" })
+  );
+
+  e.addComponent("mesh", new MeshComponent(mesh));
+  e.addComponent("collider3D", new BoxCollider3D());
+  e.addComponent("rigidbody", new RigidbodyComponent({
+    useGravity: false
+  }));
+  e.addComponent("CubeScript", new CubeScript());
+
+  return e;
 }</code></pre>
             </div>
 
@@ -486,31 +493,30 @@ export class Player extends Entity {
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="box-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-} from "kernelplay-js";
+              <pre class="p-4"><code id="box-code" class="language-javascript">import * as THREE from "three";
+import { Entity, ColliderComponent } from "kernelplay-js";
+import { MeshComponent } from "kernelplay-js";
+import { BoxCollider3D } from "kernelplay-js";
+import { TransformComponent } from "kernelplay-js";
 
-import { Layers } from "kernelplay-js";
+export function Cube(x, y, z = 0, isTrigger = false) {
+  const e = new Entity("Cube");
 
-export class Box extends Entity {
-    constructor(x, y, isTrigger = false) {
-        super("Box");
+  e.addComponent("transform", new TransformComponent({
+    position: { x, y, z},
+    scale: { x: 1, y: 2, z: 3 }
+  }));
 
-        this.layer = Layers.Player;
-        this.tag = "box"
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 1, 1),
+    new THREE.MeshStandardMaterial({ color: "red" })
+  );
 
-        this.addComponent("transform", new TransformComponent({
-            position: { x, y },
-        }));
+  e.addComponent("mesh", new MeshComponent(mesh));
+  e.addComponent("collider3D", new BoxCollider3D(isTrigger));
 
-        this.addComponent("collider", new ColliderComponent({isTrigger}));
-        this.addComponent("renderer", new BoxRenderComponent("blue"));
-    }
-}
-</code></pre>
+  return e;
+}</code></pre>
             </div>
 
             <div class="code-file hidden" data-file="playercontroller">
@@ -520,26 +526,50 @@ export class Box extends Entity {
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse, Layers } from "kernelplay-js";
+              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse } from "kernelplay-js";
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/controls/OrbitControls.js';
+import { Layers } from "kernelplay-js";
 
-export class PlayerController extends ScriptComponent {
+export class CubeScript extends ScriptComponent {
+    onStart() {
+        const renderer = this.entity.scene.game.renderer;
+
+        // OrbitControls
+        const controls = new OrbitControls(renderer.camera, renderer.renderer.domElement);
+        controls.enableDamping = true;       // smooth motion
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 1, 0);        // focus point
+        controls.update();
+    }
+
     update(dt) {
-        const rb = this.entity.getComponent("rigidbody2d");
+        const transform = this.entity.getComponent("transform");
+        const rb = this.entity.getComponent("rigidbody");
 
         rb.velocity.x = 0;
-        rb.velocity.y = 0;
+        rb.velocity.z = 0;
 
-        if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200;
-        if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200;
-        if (Keyboard.isPressed("ArrowUp")) rb.velocity.y = -200;
-        if (Keyboard.isPressed("ArrowDown")) rb.velocity.y = 200;
+        if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200 * dt;
+        if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200 * dt;
+        if (Keyboard.isPressed("ArrowUp")) rb.velocity.z = -200 * dt;
+        if (Keyboard.isPressed("ArrowDown")) rb.velocity.z = 200 * dt;
 
         if (Mouse.wasPressed(0)) {
-            const hit = this.entity.scene.raycast(Mouse.x, Mouse.y, {
-                layerMask: Layers.Player
-            });
+            const hit = this.entity.scene.raycast(Mouse.x, Mouse.y);
 
-            console.log("Hit (Player layer only):", hit?.entity?.tag);
+            // const hit = this.entity.scene.raycast(Mouse.x, Mouse.y,{
+            //     layerMask: Layers.Player
+            // });
+
+            // const hit = this.entity.scene.pick(Mouse.x, Mouse.y);
+            if (hit) {
+                // raycast
+                console.log("Clicked:", hit.entity.name, hit.distance, hit.point);
+
+                // pick
+                // console.log("Clicked:", hit.name, hit.tag);
+                // console.log("Clicked:", hit);
+            }
         }
     }
 
@@ -552,8 +582,7 @@ export class PlayerController extends ScriptComponent {
         // Called when entering a trigger collider
         console.log("Player entered trigger:", other.name);
     }
-}
-</code></pre>
+}</code></pre>
             </div>
 
           </div>
@@ -610,7 +639,7 @@ export class PlayerController extends ScriptComponent {
   </div>
   
   <script src="../../examples.js"></script>
-  <script type="module" src="../../main.js"></script>
+  <script type="module" src="../../mainWebGL3D.js"></script>
 
   <script>
     window.addEventListener('load', async () => {

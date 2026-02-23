@@ -169,7 +169,7 @@
           <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Renderer</h3>
           <nav class="space-y-2">
             <a href="../Canvas2D/" 
-               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
+               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
@@ -177,7 +177,7 @@
             </a>
             
             <a href="../PIXI2D/" 
-               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
+               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
               </svg>
@@ -250,7 +250,7 @@
             Interactive rendering examples using KernelPlay engine with multiple renderer backends.
           </p>
         </div>
-
+        
       </div>
     </aside>
     
@@ -261,7 +261,7 @@
       <header class="z-10 glass-effect border-b border-indigo-200 px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">Canvas 2D Renderer</h2>
+            <h2 class="text-xl font-bold text-gray-800">Pixi.js 2D Renderer</h2>
             <p class="text-sm text-gray-600">High-performance 2D graphics rendering</p>
           </div>
           <div class="flex items-center gap-3">
@@ -370,6 +370,7 @@
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
 import { Level1 } from "./scenes/Level1.js";
+import { WebGL2DRenderer } from "kernelplay-js";
 
 class MyGame extends Game {
   init() {
@@ -379,6 +380,7 @@ class MyGame extends Game {
 }
 
 const game = new MyGame({
+  renderer: new WebGL2DRenderer(),
   width: 800,
   height: 600,
   fps: 60
@@ -401,7 +403,7 @@ game.start();</code></pre>
   &lt;title&gt;KernelPlay Game&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
- &lt;script type="importmap"&gt;
+  &lt;script type="importmap"&gt;
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
@@ -452,7 +454,7 @@ export class Level1 extends Scene {
     Entity,
     TransformComponent,
     ColliderComponent,
-    BoxRenderComponent,
+    WebGLBoxRender2D,
     Rigidbody2DComponent
 } from "kernelplay-js";
 
@@ -473,7 +475,7 @@ export class Player extends Entity {
             useGravity: false
         }));
         this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new BoxRenderComponent("red"));
+        this.addComponent("renderer", new WebGLBoxRender2D("#ff0000"));
         this.addComponent("playerController", new PlayerController());
     }
 }</code></pre>
@@ -490,7 +492,7 @@ export class Player extends Entity {
     Entity,
     TransformComponent,
     ColliderComponent,
-    BoxRenderComponent,
+    WebGLBoxRender2D,
 } from "kernelplay-js";
 
 import { Layers } from "kernelplay-js";
@@ -507,10 +509,9 @@ export class Box extends Entity {
         }));
 
         this.addComponent("collider", new ColliderComponent({isTrigger}));
-        this.addComponent("renderer", new BoxRenderComponent("blue"));
+        this.addComponent("renderer", new WebGLBoxRender2D("#001eff"));
     }
-}
-</code></pre>
+}</code></pre>
             </div>
 
             <div class="code-file hidden" data-file="playercontroller">
@@ -610,7 +611,7 @@ export class PlayerController extends ScriptComponent {
   </div>
   
   <script src="../../examples.js"></script>
-  <script type="module" src="../../main.js"></script>
+  <script type="module" src="../../mainWebGL2D.js"></script>
 
   <script>
     window.addEventListener('load', async () => {
