@@ -23,7 +23,7 @@ export class Player extends Entity {
             useGravity: false
         }));
         this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new BoxRenderComponent("red"));
+        this.addComponent("renderer", new BoxRenderComponent({color: "blue"}));
         this.addComponent("playerController", new PlayerController());
     }
 }
