@@ -2,9 +2,9 @@ import {
     Entity,
     TransformComponent,
     ColliderComponent,
-    WebGLBoxRender2D,
 } from "kernelplay-js";
 
+import {WebGLBoxRender2D } from "@kernelplay/pixi-renderer";
 import { Layers } from "kernelplay-js";
 
 export class Box1 extends Entity {

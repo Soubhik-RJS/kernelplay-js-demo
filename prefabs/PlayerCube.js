@@ -4,8 +4,8 @@ import { CubeScript } from "../scripts/CubeScript.js";
 
 import { Layers } from "kernelplay-js";
 
-import { MeshComponent } from "kernelplay-js";
-import { BoxCollider3D } from "kernelplay-js";
+import { MeshComponent } from "@kernelplay/three-renderer";
+import { BoxCollider3D } from "@kernelplay/three-renderer";
 import { TransformComponent } from "kernelplay-js";
 import { RigidbodyComponent } from "kernelplay-js";
 

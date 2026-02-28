@@ -1,6 +1,6 @@
 import { Game } from "kernelplay-js";
 import { Level2 } from "./scenes/Level2.js";
-import { WebGL2DRenderer } from "kernelplay-js";
+import { WebGL2DRenderer } from "@kernelplay/pixi-renderer";
 
 class MyGame extends Game {
     init() {

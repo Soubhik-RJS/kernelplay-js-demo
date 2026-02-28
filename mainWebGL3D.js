@@ -1,6 +1,6 @@
 import { Game } from "kernelplay-js";
 import { Level3 } from "./scenes/Level3.js";
-import { ThreeRenderer } from "kernelplay-js";
+import { ThreeRenderer } from "@kernelplay/three-renderer";
 
 class MyGame extends Game {
     init() {

@@ -2,10 +2,10 @@ import {
     Entity,
     TransformComponent,
     ColliderComponent,
-    WebGLBoxRender2D,
     Rigidbody2DComponent
 } from "kernelplay-js";
 
+import {WebGLBoxRender2D } from "@kernelplay/pixi-renderer";
 import { PlayerController } from "../scripts/PlayerController.js";
 import { Layers } from "kernelplay-js";
 
@@ -23,7 +23,7 @@ export class Player1 extends Entity {
             useGravity: false
         }));
         this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new WebGLBoxRender2D("#ff0000"));
+        this.addComponent("renderer", new WebGLBoxRender2D({color:"blue"}));
         this.addComponent("playerController", new PlayerController());
     }
 }

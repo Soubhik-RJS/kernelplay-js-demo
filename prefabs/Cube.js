@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Entity, ColliderComponent } from "kernelplay-js";
-import { MeshComponent } from "kernelplay-js";
-import { BoxCollider3D } from "kernelplay-js";
+import { MeshComponent } from "@kernelplay/three-renderer";
+import { BoxCollider3D } from "@kernelplay/three-renderer";
 import { TransformComponent } from "kernelplay-js";
 
 export function Cube(x, y, z = 0, isTrigger = false) {

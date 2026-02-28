@@ -92,14 +92,9 @@
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script type="importmap">
-    {
-      "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/src/index.js"
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js",
+        "@kernelplay/three-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/three-renderer/dist/three-renderer.es.js"
       }
     }
   </script>
@@ -370,7 +365,7 @@
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
 import { Level1 } from "./scenes/Level1.js";
-import { ThreeRenderer } from "kernelplay-js";
+import { ThreeRenderer } from "@kernelplay/three-renderer";
 
 class MyGame extends Game {
   init() {
@@ -407,14 +402,9 @@ game.start();</code></pre>
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
-      }
-    }
-  &lt;/script&gt;
-  &lt;script type="importmap"&gt;
-    {
-      "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/src/index.js"
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js",
+        "@kernelplay/three-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/three-renderer/dist/three-renderer.es.js"
       }
     }
   &lt;/script&gt;
@@ -456,8 +446,8 @@ import { CubeScript } from "../scripts/CubeScript.js";
 
 import { Layers } from "kernelplay-js";
 
-import { MeshComponent } from "kernelplay-js";
-import { BoxCollider3D } from "kernelplay-js";
+import { MeshComponent } from "@kernelplay/three-renderer";
+import { BoxCollider3D } from "@kernelplay/three-renderer";
 import { TransformComponent } from "kernelplay-js";
 import { RigidbodyComponent } from "kernelplay-js";
 
@@ -495,8 +485,8 @@ export function PlayerCube(x, y, z = 0) {
               </div>
               <pre class="p-4"><code id="box-code" class="language-javascript">import * as THREE from "three";
 import { Entity, ColliderComponent } from "kernelplay-js";
-import { MeshComponent } from "kernelplay-js";
-import { BoxCollider3D } from "kernelplay-js";
+import { MeshComponent } from "@kernelplay/three-renderer";
+import { BoxCollider3D } from "@kernelplay/three-renderer";
 import { TransformComponent } from "kernelplay-js";
 
 export function Cube(x, y, z = 0, isTrigger = false) {

@@ -88,18 +88,13 @@
     }
   </style>
   
+
   <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
-      }
-    }
-  </script>
-  <script type="importmap">
-    {
-      "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/src/index.js"
+        "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js",
+        "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer/dist/pixi-renderer.es.js"
       }
     }
   </script>
@@ -370,7 +365,7 @@
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
 import { Level1 } from "./scenes/Level1.js";
-import { WebGL2DRenderer } from "kernelplay-js";
+import { WebGL2DRenderer } from "@kernelplay/pixi-renderer";
 
 class MyGame extends Game {
   init() {
@@ -406,15 +401,9 @@ game.start();</code></pre>
   &lt;script type="importmap"&gt;
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
-      }
-    }
-  &lt;/script&gt;
-  &lt;script type="importmap"&gt;
-    {
-      "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/src/index.js"
+        "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js",
+        "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer/dist/pixi-renderer.es.js"
       }
     }
   &lt;/script&gt;
@@ -454,10 +443,10 @@ export class Level1 extends Scene {
     Entity,
     TransformComponent,
     ColliderComponent,
-    WebGLBoxRender2D,
     Rigidbody2DComponent
 } from "kernelplay-js";
 
+import {WebGLBoxRender2D } from "@kernelplay/pixi-renderer";
 import { PlayerController } from "../scripts/PlayerController.js";
 import { Layers } from "kernelplay-js";
 
@@ -491,10 +480,10 @@ export class Player extends Entity {
               <pre class="p-4"><code id="box-code" class="language-javascript">import {
     Entity,
     TransformComponent,
-    ColliderComponent,
-    WebGLBoxRender2D,
+    ColliderComponent
 } from "kernelplay-js";
 
+import {WebGLBoxRender2D } from "@kernelplay/pixi-renderer";
 import { Layers } from "kernelplay-js";
 
 export class Box extends Entity {
