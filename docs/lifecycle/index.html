@@ -171,54 +171,54 @@
       Copy
     </button>
   </div>
-  <pre><code id="lifecycle-code" class="language-js">import {{ ScriptComponent }} from "kernelplay-js";
+  <pre><code id="lifecycle-code" class="language-js">import { ScriptComponent } from "kernelplay-js";
 
-class MyScript extends ScriptComponent {{
+class MyScript extends ScriptComponent {
 
   // Called once when the entity is added to the scene
-  onAttach() {{
+  onAttach() {
     console.log("Entity added to scene");
     this.speed = 0;
-  }}
+  }
 
   // Called once before the very first update()
-  onStart() {{
+  onStart() {
     this.speed = 150;
     this.health = 100;
-  }}
+  }
 
   // Called every frame — dt = delta time in seconds
-  update(dt) {{
+  update(dt) {
     const t = this.entity.getComponent("transform");
     t.position.x += this.speed * dt;
-  }}
+  }
 
   // Called after ALL entities have run update() — good for cameras
-  lateUpdate(dt) {{
+  lateUpdate(dt) {
     this.syncCamera();
-  }}
+  }
 
   // Called when this collider hits a solid collider
-  onCollision(other) {{
+  onCollision(other) {
     if (other.tag === "spike") this.health -= 10;
     console.log("Hit:", other.name, "Health:", this.health);
-  }}
+  }
 
   // Called when overlapping a trigger collider (isTrigger: true)
-  onTriggerEnter(other) {{
+  onTriggerEnter(other) {
     if (other.tag === "checkpoint") this.savePosition();
-  }}
+  }
 
   // Called when leaving a trigger zone
-  onTriggerExit(other) {{
+  onTriggerExit(other) {
     console.log("Left trigger:", other.name);
-  }}
+  }
 
   // Called when entity.destroy() is used or scene unloads
-  onDestroy() {{
+  onDestroy() {
     console.log("Cleanup resources");
-  }}
-}}</code></pre>
+  }
+}</code></pre>
 </div>
 
 

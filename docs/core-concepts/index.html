@@ -370,9 +370,9 @@ enemy.tag = "enemy";
 enemy.layer = 2;
 
 // Add components to define behavior
-enemy.addComponent("transform", new TransformComponent({{ position: {{ x: 200, y: 100 }} }}));
-enemy.addComponent("renderer", new BoxRenderComponent("red", 40, 40));
-enemy.addComponent("collider", new ColliderComponent({{ width: 40, height: 40 }}));
+enemy.addComponent("transform", new TransformComponent({ position: { x: 200, y: 100 } }));
+enemy.addComponent("renderer", new BoxRenderComponent({ color: "red" }));
+enemy.addComponent("collider", new ColliderComponent());
 enemy.addComponent("script", new EnemyAI()); // custom script
 
 scene.addEntity(enemy);</code></pre>

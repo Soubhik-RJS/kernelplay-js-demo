@@ -171,16 +171,16 @@
       Copy
     </button>
   </div>
-  <pre><code id="keyboard-code" class="language-js">import {{ Keyboard }} from "kernelplay-js";
+  <pre><code id="keyboard-code" class="language-js">import { Keyboard } from "kernelplay-js";
 
 // Held down this frame
-if (Keyboard.isPressed("ArrowRight")) {{ rb.velocity.x = 200; }}
+if (Keyboard.isPressed("ArrowRight")) { rb.velocity.x = 200; }
 
 // Pressed exactly this frame (good for jumps/actions)
-if (Keyboard.wasPressed("Space")) {{ rb.velocity.y = -400; }}
+if (Keyboard.wasPressed("Space")) { rb.velocity.y = -400; }
 
 // Released this frame
-if (Keyboard.wasReleased("Escape")) {{ pauseGame(); }}
+if (Keyboard.wasReleased("Escape")) { pauseGame(); }
 
 // Common key strings:
 // Arrow keys:  "ArrowUp" "ArrowDown" "ArrowLeft" "ArrowRight"
@@ -200,16 +200,16 @@ if (Keyboard.wasReleased("Escape")) {{ pauseGame(); }}
       Copy
     </button>
   </div>
-  <pre><code id="mouse-code" class="language-js">import {{ Mouse }} from "kernelplay-js";
+  <pre><code id="mouse-code" class="language-js">import { Mouse } from "kernelplay-js";
 
 // Position (canvas-relative)
 const x = Mouse.x;
 const y = Mouse.y;
 
 // Buttons: 0 = left, 1 = middle, 2 = right
-if (Mouse.isPressed(0))    {{ /* holding left button */ }}
-if (Mouse.wasPressed(0))   {{ /* clicked this frame */ }}
-if (Mouse.wasReleased(2))  {{ /* right button released */ }}
+if (Mouse.isPressed(0))    { /* holding left button */ }
+if (Mouse.wasPressed(0))   { /* clicked this frame */ }
+if (Mouse.wasReleased(2))  { /* right button released */ }
 
 // Delta movement since last frame
 const dx = Mouse.deltaX;
@@ -231,17 +231,17 @@ const scroll = Mouse.scrollDelta;</code></pre>
       Copy
     </button>
   </div>
-  <pre><code id="raycast-code" class="language-js">class ClickToSelect extends ScriptComponent {{
-  update(dt) {{
-    if (Mouse.wasPressed(0)) {{
+  <pre><code id="raycast-code" class="language-js">class ClickToSelect extends ScriptComponent {
+  update(dt) {
+    if (Mouse.wasPressed(0)) {
       const hit = this.entity.scene.raycast(Mouse.x, Mouse.y);
-      if (hit) {{
+      if (hit) {
         console.log("Clicked entity:", hit.entity.name);
         hit.entity.getComponent("renderer").color = "yellow";
-      }}
-    }}
-  }}
-}}</code></pre>
+      }
+    }
+  }
+}</code></pre>
 </div>
 
 
@@ -255,15 +255,15 @@ const scroll = Mouse.scrollDelta;</code></pre>
       Copy
     </button>
   </div>
-  <pre><code id="gamepad-code" class="language-js">import {{ Gamepad }} from "kernelplay-js";
+  <pre><code id="gamepad-code" class="language-js">import { Gamepad } from "kernelplay-js";
 
 // Analog sticks — returns -1 to 1
 const lx = Gamepad.axis(0);   // left stick X
 const ly = Gamepad.axis(1);   // left stick Y
 
 // Buttons
-if (Gamepad.wasPressed("A")) {{ jump(); }}
-if (Gamepad.isPressed("RT"))  {{ {{ /* right trigger */ }} }}</code></pre>
+if (Gamepad.wasPressed("A")) { jump(); }
+if (Gamepad.isPressed("RT"))  { { /* right trigger */ } }</code></pre>
 </div>
 
 

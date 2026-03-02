@@ -174,18 +174,15 @@
   </div>
   <pre><code id="phys-entity" class="language-js">const player = new Entity("Player");
 
-player.addComponent("transform", new TransformComponent({{
-  position: {{ x: 400, y: 100 }}
-}}));
-player.addComponent("rigidbody2d", new Rigidbody2DComponent({{
+player.addComponent("transform", new TransformComponent({
+  position: { x: 400, y: 100 }
+}));
+player.addComponent("rigidbody2d", new Rigidbody2DComponent({
   useGravity: true,
   mass: 1,
   drag: 0.02
-}}));
-player.addComponent("collider", new ColliderComponent({{
-  width: 32,
-  height: 48
-}}));
+}));
+player.addComponent("collider", new ColliderComponent());
 
 scene.addEntity(player);</code></pre>
 </div>
@@ -201,8 +198,8 @@ scene.addEntity(player);</code></pre>
       Copy
     </button>
   </div>
-  <pre><code id="phys-script" class="language-js">class PlayerController extends ScriptComponent {{
-  update(dt) {{
+  <pre><code id="phys-script" class="language-js">class PlayerController extends ScriptComponent {
+  update(dt) {
     const rb = this.entity.getComponent("rigidbody2d");
     const speed = 200;
 
@@ -212,17 +209,17 @@ scene.addEntity(player);</code></pre>
     else rb.velocity.x *= 0.8; // friction
 
     // Jump — only when on ground
-    if (Keyboard.wasPressed("Space") && this.isGrounded) {{
+    if (Keyboard.wasPressed("Space") && this.isGrounded) {
       rb.velocity.y = -420;
-    }}
-  }}
+    }
+  }
 
-  onCollision(other) {{
+  onCollision(other) {
     // Detect ground
     if (other.tag === "ground") this.isGrounded = true;
     if (other.name === "Enemy") other.destroy();
-  }}
-}}</code></pre>
+  }
+}</code></pre>
 </div>
 
 
@@ -239,18 +236,18 @@ scene.addEntity(player);</code></pre>
   </div>
   <pre><code id="trigger-code" class="language-js">// Coin entity
 const coin = new Entity("Coin");
-coin.addComponent("collider", new ColliderComponent({{
+coin.addComponent("collider", new ColliderComponent({
   width: 20, height: 20,
   isTrigger: true        // ← no push, just events
-}}));
-coin.addComponent("script", new class extends ScriptComponent {{
-  onTriggerEnter(other) {{
-    if (other.tag === "player") {{
+}));
+coin.addComponent("script", new class extends ScriptComponent {
+  onTriggerEnter(other) {
+    if (other.tag === "player") {
       score += 10;
       this.entity.destroy();
-    }}
-  }}
-}}());</code></pre>
+    }
+  }
+}());</code></pre>
 </div>
 
 

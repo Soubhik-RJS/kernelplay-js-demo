@@ -169,8 +169,8 @@
   </div>
   <div style="padding:20px;border-radius:12px;border:2px solid #c7d2fe;background:#eef2ff;">
     <div style="font-size:1.5rem;margin-bottom:8px;">⚡</div>
-    <h3 style="font-weight:700;margin-bottom:6px;">WebGL 2D</h3>
-    <p style="font-size:0.85rem;color:#4338ca;">GPU-accelerated 2D. Handles thousands of sprites smoothly.</p>
+    <h3 style="font-weight:700;margin-bottom:6px;">Pixi.js 2D</h3>
+    <p style="font-size:0.85rem;color:#4338ca;">Full GPU-accelerated 2D. Handles thousands of sprites smoothly with Pixi.js integration.</p>
   </div>
   <div style="padding:20px;border-radius:12px;border:2px solid #ddd6fe;background:#f5f3ff;">
     <div style="font-size:1.5rem;margin-bottom:8px;">🌐</div>
@@ -191,11 +191,46 @@
     </button>
   </div>
   <pre><code id="canvas2d-code" class="language-js">// Default Canvas 2D — just run the game
-new MyGame({{ width: 800, height: 600, fps: 60 }}).start();</code></pre>
+new MyGame({ width: 800, height: 600, fps: 60 }).start();</code></pre>
 </div>
 
 
-<h2 class="section-title" style="margin-top:36px;">WebGL 2D Renderer</h2>
+<h2 class="section-title" style="margin-top:36px;">Pixi.js 2D Renderer</h2>
+
+<div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn" onclick="copyCode('install-npm')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="install-npm" class="language-bash">npm install @kernelplay/pixi-renderer pixi.js kernelplay-js</code></pre>
+        </div>
+<div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">html</span>
+            <button class="copy-btn" onclick="copyCode('install-cdn')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="install-cdn" class="language-html">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
+    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/dist/kernelplay.es.js",
+    "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer/dist/pixi-renderer.es.js"
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
 
 <div class="code-wrap">
   <div class="code-header">
@@ -205,19 +240,55 @@ new MyGame({{ width: 800, height: 600, fps: 60 }}).start();</code></pre>
       Copy
     </button>
   </div>
-  <pre><code id="webgl2d-code" class="language-js">import {{ WebGL2DRenderer }} from "kernelplay-js";
+  <pre><code id="webgl2d-code" class="language-js">import { WebGL2DRenderer } from "@kernelplay/pixi-renderer";
 
-new MyGame({{
+new MyGame({
   renderer: new WebGL2DRenderer(),
   width: 800,
   height: 600,
   fps: 60,
   backgroundColor: "#eeeeee"
-}}).start();</code></pre>
+}).start();</code></pre>
 </div>
 
 
 <h2 class="section-title" style="margin-top:36px;">Three.js 3D Renderer</h2>
+
+<div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">bash</span>
+            <button class="copy-btn" onclick="copyCode('install-npm')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="install-npm" class="language-bash">npm install @kernelplay/three-renderer three kernelplay-js</code></pre>
+        </div>
+<div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">html</span>
+            <button class="copy-btn" onclick="copyCode('install-cdn')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="install-cdn" class="language-html">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/",
+    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/dist/kernelplay.es.js",
+    "@kernelplay/three-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/three-renderer/dist/three-renderer.es.js"
+  }
+}
+&lt;/script&gt;</code></pre>
+        </div>
 
 <div class="code-wrap">
   <div class="code-header">
@@ -227,26 +298,26 @@ new MyGame({{
       Copy
     </button>
   </div>
-  <pre><code id="three-code" class="language-js">import {{ ThreeRenderer }} from "kernelplay-js";
+  <pre><code id="three-code" class="language-js">import { ThreeRenderer } from "@kernelplay/three-renderer";
 import * as THREE from "three";
 
-new MyGame({{
+new MyGame({
   renderer: new ThreeRenderer(),
   width: 800,
   height: 600,
   fps: 60
-}}).start();
+}).start();
 
 // Use 3D components with Three renderer
-entity.addComponent("transform", new TransformComponent({{
-  position: {{ x: 0, y: 0, z: -5 }}
-}}));</code></pre>
+entity.addComponent("transform", new TransformComponent({
+  position: { x: 0, y: 0, z: -5 }
+}));</code></pre>
 </div>
 
 
 <div class="info-card" style="background:#fffbeb;border-color:#fde68a;margin-top:16px;">
-  <p style="color:#92400e;font-weight:600;">⚠️ Three.js peer dependency</p>
-  <p style="color:#b45309;font-size:0.9rem;">When using ThreeRenderer, install three separately: <code class="inline">npm install three</code></p>
+  <p style="color:#92400e;font-weight:600;">⚠️ Three.js & Pixi.js peer dependency</p>
+  <p style="color:#b45309;font-size:0.9rem;">When using ThreeRenderer, install three separately: <code class="inline">npm install three</code> <code class="inline">npm install pixi.js</code></p>
 </div>
 
         <div class="prev-next"><a href="../components" class="pn-btn"><span class="pn-label">← Previous</span><span class="pn-title">Components</span></a><a href="../physics" class="pn-btn next"><span class="pn-label">Next →</span><span class="pn-title">Physics</span></a></div>

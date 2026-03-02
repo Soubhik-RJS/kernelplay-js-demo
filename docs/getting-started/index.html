@@ -334,8 +334,7 @@
               Copy
             </button>
           </div>
-          <pre><code id="install-npm" class="language-bash">npm install kernelplay-js --save
-npm install three --save</code></pre>
+          <pre><code id="install-npm" class="language-bash">npm install kernelplay-js --save</code></pre>
         </div>
 
 
@@ -351,12 +350,11 @@ npm install three --save</code></pre>
             </button>
           </div>
           <pre><code id="install-cdn" class="language-html">&lt;script type="importmap"&gt;
-{{
-  "imports": {{
-    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/src/index.js",
-    "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
-  }}
-}}
+{
+  "imports": {
+    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/dist/kernelplay.es.js",
+  }
+}
 &lt;/script&gt;</code></pre>
         </div>
 
@@ -376,29 +374,29 @@ npm install three --save</code></pre>
               Copy
             </button>
           </div>
-          <pre><code id="basic-setup" class="language-js">import {{ Game, Scene, Entity }} from "kernelplay-js";
-import {{ TransformComponent, BoxRenderComponent }} from "kernelplay-js";
+          <pre><code id="basic-setup" class="language-js">import { Game, Scene, Entity } from "kernelplay-js";
+import { TransformComponent, BoxRenderComponent } from "kernelplay-js";
 
-class MyScene extends Scene {{
-  init() {{
+class MyScene extends Scene {
+  init() {
     const box = new Entity();
-    box.addComponent("transform", new TransformComponent({{
-      position: {{ x: 400, y: 300 }}
-    }}));
-    box.addComponent("renderer", new BoxRenderComponent("red"));
+    box.addComponent("transform", new TransformComponent({
+      position: { x: 400, y: 300 }
+    }));
+    box.addComponent("renderer", new BoxRenderComponent({ color: "red" }));
     this.addEntity(box);
-  }}
-}}
+  }
+}
 
-class MyGame extends Game {{
-  init() {{
+class MyGame extends Game {
+  init() {
     const scene = new MyScene("Main");
     this.sceneManager.addScene(scene);
     this.sceneManager.startScene("Main");
-  }}
-}}
+  }
+}
 
-new MyGame({{ width: 800, height: 600, fps: 60 }}).start();</code></pre>
+new MyGame({ width: 800, height: 600, fps: 60 }).start();</code></pre>
         </div>
 
 
