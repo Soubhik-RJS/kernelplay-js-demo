@@ -5,10 +5,6 @@ import {
     BoxRenderComponent,
 } from "kernelplay-js";
 
-// class CoinScript extends ScriptComponent{
-    
-// }
-
 export class Box extends Entity {
     constructor(x, y, name="Wall") {
 

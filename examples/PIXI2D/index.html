@@ -189,23 +189,24 @@
           </nav>
         </div>
         
-        <!-- <div class="mb-6">
+        <div class="mb-6">
           <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Benchmark</h3>
           <div class="space-y-2">
-            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-left text-sm">
+            <!-- <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-left text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
               </svg>
               <span class="font-medium">Performance</span>
-            </button>
-            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-left text-sm">
+            </button> -->
+            <a href="../BenchmarkCanvas2D/"
+              class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <span class="font-medium">Stress Test</span>
-            </button>
+            </a>
           </div>
-        </div> -->
+        </div>
         
         <!-- <div class="mb-6">
           <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Games</h3>
@@ -275,20 +276,21 @@
               
               <div id="settings-dropdown" class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl border border-indigo-200 z-50">
                 <div class="py-2">
-                  <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
+                  <button onclick="window.location.reload();" class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                     Reset Demo
                   </button>
-                  <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
+                  <a href="../../fullscreen/PIXI2D/"
+                    class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 4H4m0 0v4m0-4 5 5m7-5h4m0 0v4m0-4-5 5M8 20H4m0 0v-4m0 4 5-5m7 5h4m0 0v-4m0 4-5-5" />
                     </svg>
-                    Toggle Console
-                  </button>
-                  <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
+                    Full Screen
+                  </a>
+                  <!-- <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -300,7 +302,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     Help
-                  </button>
+                  </button> -->
                 </div>
               </div>
             </div>
@@ -414,7 +416,7 @@ game.start();</code></pre>
             
             <div class="code-file hidden" data-file="scene">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">scene.js</span>
+                <span class="text-xs text-gray-400">Level1.js</span>
                 <button onclick="copyCodeFile(event, 'scene-code')" class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
@@ -425,16 +427,24 @@ import { Box } from "../prefabs/Box.js";
 
 export class Level1 extends Scene {
   init() {
-    this.addEntity(new Player(400, 300));
-    this.addEntity(new Box(500, 300));
-    this.addEntity(new Box(300, 300, true));
+    this.addEntity(new Player(400, 100));
+
+    this.addEntity(new Box(400, 300, "Wall"));
+    this.addEntity(new Box(650, 370, "Wall"));
+    this.addEntity(new Box(650, 170, "Wall"));
+    this.addEntity(new Box(150, 170, "Wall"));
+    this.addEntity(new Box(150, 360, "Wall"));
+
+    this.addEntity(new Box(650, 120, "Coin"));
+    this.addEntity(new Box(150, 315, "Coin"));
   }
-}</code></pre>
+}
+</code></pre>
             </div>
             
             <div class="code-file hidden" data-file="player">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
+                <span class="text-xs text-gray-400">Player.js</span>
                 <button onclick="copyCodeFile(event, 'player-code')" class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
@@ -461,7 +471,8 @@ export class Player extends Entity {
             position: { x, y },
         }));
         this.addComponent("rigidbody2d",new Rigidbody2DComponent({
-            useGravity: false
+            mass: 1,
+            gravityScale: 1
         }));
         this.addComponent("collider", new ColliderComponent());
         this.addComponent("renderer", new WebGLBoxRender2D("#ff0000"));
@@ -472,7 +483,7 @@ export class Player extends Entity {
 
             <div class="code-file hidden" data-file="box">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
+                <span class="text-xs text-gray-400">Box.js</span>
                 <button onclick="copyCodeFile(event, 'box-code')" class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
@@ -480,32 +491,45 @@ export class Player extends Entity {
               <pre class="p-4"><code id="box-code" class="language-javascript">import {
     Entity,
     TransformComponent,
-    ColliderComponent
+    ColliderComponent,
 } from "kernelplay-js";
 
 import {WebGLBoxRender2D } from "@kernelplay/pixi-renderer";
 import { Layers } from "kernelplay-js";
 
 export class Box extends Entity {
-    constructor(x, y, isTrigger = false) {
-        super("Box");
+    constructor(x, y, name="Wall") {
+        super(name);
+        this.tag = name.toLowerCase();
+        this.zIndex = -1;
 
-        this.layer = Layers.Player;
-        this.tag = "box"
-
-        this.addComponent("transform", new TransformComponent({
-            position: { x, y },
-        }));
-
-        this.addComponent("collider", new ColliderComponent({isTrigger}));
-        this.addComponent("renderer", new WebGLBoxRender2D("#001eff"));
+        switch (name) {
+            case "Wall":
+                this.addComponent("transform", new TransformComponent({
+                    position: { x, y },
+                    scale: {x: 3, y: 1}
+                }));
+                this.addComponent("collider", new ColliderComponent({isTrigger:false}));
+                this.addComponent("renderer", new WebGLBoxRender2D({color:"#135800"}));
+                break;
+        
+            case "Coin":
+                this.addComponent("transform", new TransformComponent({
+                    position: { x, y },
+                    scale: {x: 0.4, y: 0.4}
+                }));
+                this.addComponent("collider", new ColliderComponent({isTrigger:true}));
+                this.addComponent("renderer", new WebGLBoxRender2D({color:"#ffea00"}));
+                break;
+        }
     }
-}</code></pre>
+}
+</code></pre>
             </div>
 
             <div class="code-file hidden" data-file="playercontroller">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
+                <span class="text-xs text-gray-400">PlayerController.js</span>
                 <button onclick="copyCodeFile(event, 'script-code')" class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
@@ -513,11 +537,15 @@ export class Box extends Entity {
               <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse, Layers } from "kernelplay-js";
 
 export class PlayerController extends ScriptComponent {
+    onStart(){
+        this.pos = this.entity.getComponent("transform").position;
+    }
+
     update(dt) {
         const rb = this.entity.getComponent("rigidbody2d");
 
         rb.velocity.x = 0;
-        rb.velocity.y = 0;
+        // rb.velocity.y = 0;
 
         if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200;
         if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200;
@@ -531,16 +559,33 @@ export class PlayerController extends ScriptComponent {
 
             console.log("Hit (Player layer only):", hit?.entity?.tag);
         }
+
+        if (rb.isGrounded) {
+            if (Keyboard.isPressed(" ")) {
+                rb.addForce(0, -600, "impulse");
+                this.isGround = false;
+            }
+        }
+
+        if(this.pos.x > 1000, this.pos.y > 1000) {
+            this.pos.x = 400;
+            this.pos.y = 100;
+        }
     }
 
-    onCollision(other) {
-        // Called when a solid collision occurs
-        console.log("Player hit:", other.name);
-    }
+    // onCollision(other) {
+    //     // Called when a solid collision occurs
+    //     console.log("Player hit:", other.name);
+    // }
 
     onTriggerEnter(other) {
         // Called when entering a trigger collider
-        console.log("Player entered trigger:", other.name);
+        // console.log("Player entered trigger:", other.tag);
+        if (other.tag === "coin") {
+            other.destroy();
+            console.log("Coin collected !!!");
+            
+        }
     }
 }
 </code></pre>

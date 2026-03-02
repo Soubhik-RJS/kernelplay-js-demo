@@ -387,7 +387,7 @@
                   <div class="my-3 border-t border-indigo-200"></div>
 
                   <!-- Other Options -->
-                  <button
+                  <button onclick="window.location.reload();"
                     class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 rounded-lg flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -395,16 +395,14 @@
                     </svg>
                     Reset Demo
                   </button>
-                  <button
-                    class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 rounded-lg flex items-center gap-2">
+                  <a href="../../fullscreen/BenchmarkCanvas2D/"
+                    class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 4H4m0 0v4m0-4 5 5m7-5h4m0 0v4m0-4-5 5M8 20H4m0 0v-4m0 4 5-5m7 5h4m0 0v-4m0 4-5-5" />
                     </svg>
-                    Toggle Console
-                  </button>
+                    Full Screen
+                  </a>
                 </div>
               </div>
             </div>
@@ -446,17 +444,7 @@
               main.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="scene">
-              scenes/Level1.js
-            </button>
-            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="player">
-              prefabs/Player.js
-            </button>
-            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="box">
-              prefabs/Box.js
-            </button>
-            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap"
-              data-file="playercontroller">
-              script/PlayerController.js
+              scenes/BenchmarkScene.js
             </button>
 
           </div>
@@ -472,22 +460,23 @@
                 </button>
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
-import { Level1 } from "./scenes/Level1.js";
+import { BenchmarkScene } from "./scenes/BenchmarkScene.js";
 
 class MyGame extends Game {
   init() {
-    this.sceneManager.addScene(new Level1("Level1"));
-    this.sceneManager.startScene("Level1");
+    this.sceneManager.addScene(new BenchmarkScene("BenchmarkScene"));
+    this.sceneManager.startScene("BenchmarkScene");
   }
 }
 
 const game = new MyGame({
   width: 800,
   height: 600,
-  fps: 60
+  fps: 90
 });
 
-game.start();</code></pre>
+game.start();
+</code></pre>
             </div>
 
             <div class="code-file active" data-file="index">
@@ -519,141 +508,258 @@ game.start();</code></pre>
 
             <div class="code-file hidden" data-file="scene">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">scene.js</span>
+                <span class="text-xs text-gray-400">BenchmarkScene.js</span>
                 <button onclick="copyCodeFile(event, 'scene-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene } from "kernelplay-js";
-import { Player } from "../prefabs/Player.js";
-import { Box } from "../prefabs/Box.js";
+              <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene, Entity, Keyboard } from "kernelplay-js";
+import { BoxRenderComponent, ColliderComponent } from "kernelplay-js";
+import { TransformComponent } from "kernelplay-js";
+import { Rigidbody2DComponent } from "kernelplay-js";
 
-export class Level1 extends Scene {
-  init() {
-    this.addEntity(new Player(400, 300));
-    this.addEntity(new Box(500, 300));
-    this.addEntity(new Box(300, 300, true));
-  }
-}</code></pre>
-            </div>
+export class BenchmarkScene extends Scene {
+    init() {
+        this.ctx = this.game.renderer.ctx;
 
-            <div class="code-file hidden" data-file="player">
-              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
-                <button onclick="copyCodeFile(event, 'player-code')"
-                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
-                  Copy
-                </button>
-              </div>
-              <pre class="p-4"><code id="player-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-    Rigidbody2DComponent
-} from "kernelplay-js";
+        // 🔥 FPS tracking
+        this.fps = 0;
+        this.frames = 0;
+        this.lastTime = performance.now();
 
-import { PlayerController } from "../scripts/PlayerController.js";
-import { Layers } from "kernelplay-js";
+        // 🔥 Frame time tracking
+        this.frameTime = 0;
+        this.avgFrameTime = 0;
+        this.frameTimeSamples = [];
+        this.maxSamples = 60;
 
-export class Player extends Entity {
-    constructor(x, y) {
-        super("Player");
+        // 🔥 GC detection
+        this.lastFrameTime = 0;
+        this.gcSpikes = 0;
+        this.gcSpikeThreshold = 16.67 * 3; // 3x normal frame time (50ms)
 
-        this.layer = Layers.Player;
-        this.tag = "player"
+        // 🔥 CPU usage estimation
+        this.cpuUsage = 0;
 
-        this.addComponent("transform", new TransformComponent({
-            position: { x, y },
-        }));
-        this.addComponent("rigidbody2d",new Rigidbody2DComponent({
-            useGravity: false
-        }));
-        this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new BoxRenderComponent("red"));
-        this.addComponent("playerController", new PlayerController());
+        // 🔥 Stats
+        this.entityCount = 5000;
+        this.visibleCount = 0;
+
+        // 🔥 Settings from HTML controls (will be updated)
+        this.settings = {
+            objectCount: 5000,
+            physicsPercentage: 10,
+            density: 5000 // spread area
+        };
+
+        // 🔥 Create initial entities
+        this.rebuildScene();
+
+        // 🔥 Listen for settings changes
+        this.setupSettingsListener();
     }
-}</code></pre>
-            </div>
 
-            <div class="code-file hidden" data-file="box">
-              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
-                <button onclick="copyCodeFile(event, 'box-code')"
-                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
-                  Copy
-                </button>
-              </div>
-              <pre class="p-4"><code id="box-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-} from "kernelplay-js";
-
-import { Layers } from "kernelplay-js";
-
-export class Box extends Entity {
-    constructor(x, y, isTrigger = false) {
-        super("Box");
-
-        this.layer = Layers.Player;
-        this.tag = "box"
-
-        this.addComponent("transform", new TransformComponent({
-            position: { x, y },
-        }));
-
-        this.addComponent("collider", new ColliderComponent({isTrigger}));
-        this.addComponent("renderer", new BoxRenderComponent("blue"));
+    setupSettingsListener() {
+        // Check for settings updates from HTML UI
+        window.benchmarkSettings = this.settings;
+        
+        window.updateBenchmarkSettings = (newSettings) => {
+            this.settings = { ...this.settings, ...newSettings };
+            this.rebuildScene();
+        };
     }
-}
-</code></pre>
-            </div>
 
-            <div class="code-file hidden" data-file="playercontroller">
-              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">player.js</span>
-                <button onclick="copyCodeFile(event, 'script-code')"
-                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
-                  Copy
-                </button>
-              </div>
-              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse, Layers } from "kernelplay-js";
+    rebuildScene() {
+        console.log(`🔥 Creating ${this.settings.objectCount} entities...`);
+        const startTime = performance.now();
 
-export class PlayerController extends ScriptComponent {
-    update(dt) {
-        const rb = this.entity.getComponent("rigidbody2d");
+        // Clear existing entities
+        for (const entity of this.entities) {
+            entity.destroy();
+        }
+        this.entities = [];
+        this._rigidbody2D = [];
+        this._colliders = [];
+        this._renderers = [];
 
-        rb.velocity.x = 0;
-        rb.velocity.y = 0;
+        this.createEntities(this.settings.objectCount);
 
-        if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200;
-        if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200;
-        if (Keyboard.isPressed("ArrowUp")) rb.velocity.y = -200;
-        if (Keyboard.isPressed("ArrowDown")) rb.velocity.y = 200;
+        const endTime = performance.now();
+        console.log(`✅ Created in ${(endTime - startTime).toFixed(2)}ms`);
+    }
 
-        if (Mouse.wasPressed(0)) {
-            const hit = this.entity.scene.raycast(Mouse.x, Mouse.y, {
-                layerMask: Layers.Player
-            });
+    createEntities(count) {
+        const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
+        const physicsChance = this.settings.physicsPercentage / 100;
+        const spread = this.settings.density;
 
-            console.log("Hit (Player layer only):", hit?.entity?.tag);
+        for (let i = 0; i < count; i++) {
+            const entity = new Entity(`Box_${i}`);
+
+            // Random position based on density
+            const x = Math.random() * spread - spread / 2;
+            const y = Math.random() * spread - spread / 2;
+
+            entity.addComponent("transform", new TransformComponent({
+                position: { x, y, z: 0 }
+            }));
+
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            entity.addComponent("renderer", new BoxRenderComponent({
+                color,
+                zIndex: Math.floor(Math.random() * 10)
+            }));
+
+            // Physics based on percentage
+            if (Math.random() < physicsChance) {
+                entity.addComponent("collider", new ColliderComponent({
+                    width: 50,
+                    height: 50
+                }));
+
+                entity.addComponent("rigidbody2d", new Rigidbody2DComponent({
+                    mass: 1,
+                    gravityScale: 0,
+                    drag: 0.1
+                }));
+
+                const rb = entity.getComponent("rigidbody2d");
+                rb.velocity.x = (Math.random() - 0.5) * 200;
+                rb.velocity.y = (Math.random() - 0.5) * 200;
+            }
+
+            this.addEntity(entity);
         }
     }
 
-    onCollision(other) {
-        // Called when a solid collision occurs
-        console.log("Player hit:", other.name);
+    update(dt) {
+        const updateStart = performance.now();
+
+        super.update(dt);
+
+        // 🔥 Frame time calculation
+        const updateEnd = performance.now();
+        this.frameTime = updateEnd - updateStart;
+
+        // 🔥 Average frame time
+        this.frameTimeSamples.push(this.frameTime);
+        if (this.frameTimeSamples.length > this.maxSamples) {
+            this.frameTimeSamples.shift();
+        }
+        this.avgFrameTime = this.frameTimeSamples.reduce((a, b) => a + b, 0) / this.frameTimeSamples.length;
+
+        // 🔥 GC spike detection
+        if (this.lastFrameTime > 0 && this.frameTime > this.gcSpikeThreshold) {
+            this.gcSpikes++;
+        }
+        this.lastFrameTime = this.frameTime;
+
+        // 🔥 CPU usage estimation (frame time / target frame time)
+        this.cpuUsage = Math.min(100, (this.frameTime / 16.67) * 100);
+
+        // 🔥 FPS calculation
+        this.frames++;
+        const now = performance.now();
+
+        if (now >= this.lastTime + 1000) {
+            this.fps = Math.round((this.frames * 1000) / (now - this.lastTime));
+            this.frames = 0;
+            this.lastTime = now;
+            
+            // Reset GC spike counter every second
+            if (this.gcSpikes > 0) {
+                console.log(`⚠️ ${this.gcSpikes} GC spikes detected in last second`);
+            }
+            this.gcSpikes = 0;
+        }
+
+        // 🔥 Camera controls
+        const speed = 500;
+        if (Keyboard.isPressed("ArrowLeft")) this.game.camera.x -= speed * dt;
+        if (Keyboard.isPressed("ArrowRight")) this.game.camera.x += speed * dt;
+        if (Keyboard.isPressed("ArrowUp")) this.game.camera.y -= speed * dt;
+        if (Keyboard.isPressed("ArrowDown")) this.game.camera.y += speed * dt;
+
+        // 🔥 Update visible count
+        this.visibleCount = this._visibleCount || 0;
+
+        // Exit benchmark
+        if (Keyboard.isPressed("Escape")) {
+            this.game.sceneManager.startScene("Menu");
+        }
     }
 
-    onTriggerEnter(other) {
-        // Called when entering a trigger collider
-        console.log("Player entered trigger:", other.name);
+    render() {
+        const { width, height } = this.game.config;
+
+        // 🔥 Render via parent (uses optimized renderer)
+        super.render(this.game.renderer);
+
+        // 🔥 Draw enhanced stats overlay
+        this.ctx.save();
+        
+        // Background panel
+        this.ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+        this.ctx.fillRect(10, 10, 320, 260);
+
+        // Title
+        this.ctx.fillStyle = "#00FFFF";
+        this.ctx.font = "bold 18px monospace";
+        this.ctx.fillText("PERFORMANCE METRICS", 20, 35);
+
+        // FPS (color coded)
+        this.ctx.font = "16px monospace";
+        if (this.fps >= 55) {
+            this.ctx.fillStyle = "#00FF00"; // Green
+        } else if (this.fps >= 30) {
+            this.ctx.fillStyle = "#FFFF00"; // Yellow
+        } else {
+            this.ctx.fillStyle = "#FF0000"; // Red
+        }
+        this.ctx.fillText(`FPS: ${this.fps}`, 20, 65);
+
+        // Frame time
+        this.ctx.fillStyle = "#FFFFFF";
+        this.ctx.fillText(`Frame Time: ${this.frameTime.toFixed(2)}ms`, 20, 90);
+        this.ctx.fillText(`Avg Frame: ${this.avgFrameTime.toFixed(2)}ms`, 20, 110);
+
+        // CPU usage
+        const cpuColor = this.cpuUsage > 90 ? "#FF0000" : 
+                        this.cpuUsage > 70 ? "#FFFF00" : "#00FF00";
+        this.ctx.fillStyle = cpuColor;
+        this.ctx.fillText(`CPU Usage: ${this.cpuUsage.toFixed(1)}%`, 20, 130);
+
+        // GC spikes
+        this.ctx.fillStyle = this.gcSpikes > 0 ? "#FF0000" : "#00FF00";
+        this.ctx.fillText(`GC Spikes: ${this.gcSpikes}/sec`, 20, 150);
+
+        // Entity stats
+        this.ctx.fillStyle = "#FFFFFF";
+        this.ctx.fillText(`Total Entities: ${this.entities.length}`, 20, 175);
+        this.ctx.fillText(`Visible: ${this.visibleCount}`, 20, 195);
+        this.ctx.fillText(`Physics: ${this._rigidbody2D.length}`, 20, 215);
+        
+        // Camera position
+        this.ctx.fillStyle = "#888888";
+        this.ctx.font = "12px monospace";
+        this.ctx.fillText(
+            `Cam: (${Math.round(this.game.camera.x)}, ${Math.round(this.game.camera.y)})`, 
+            20, 
+            240
+        );
+
+        // Controls
+        this.ctx.fillStyle = "#000000";
+        this.ctx.font = "14px monospace";
+        this.ctx.fillText("Arrow Keys: Move Camera", 20, height - 60);
+        this.ctx.fillText("Use HTML Controls to adjust →", 20, height - 40);
+        this.ctx.fillText("ESC: Exit Benchmark", 20, height - 20);
+
+        this.ctx.restore();
     }
-}
-</code></pre>
+}</code></pre>
             </div>
 
           </div>

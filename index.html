@@ -123,7 +123,7 @@
       <div class="text-center">
         <div class="inline-block mb-4">
           <span class="px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold">
-            🎮 v0.1.2-alpha • Open Source
+            🎮 v0.2.0-alpha • Open Source
           </span>
         </div>
         
@@ -308,7 +308,7 @@
             <pre id="cdn-code" class="p-4 text-sm text-gray-300 overflow-x-auto"><code>&lt;script type="importmap"&gt;
 {
   "imports": {
-    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js/src/index.js"
+    "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js"
   }
 }
 &lt;/script&gt;</code></pre>
@@ -338,7 +338,7 @@ class MyScene extends Scene {
     box.addComponent("transform", new TransformComponent({
       position: { x: 300, y: 200 }
     }));
-    box.addComponent("renderer", new BoxRenderComponent("red"));
+    box.addComponent("renderer", new BoxRenderComponent({color:"red"}));
     
     this.addEntity(box);
   }
