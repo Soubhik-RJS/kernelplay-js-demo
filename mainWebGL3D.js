@@ -13,7 +13,7 @@ const game = new MyGame({
     renderer: new ThreeRenderer(),
     width: 800,
     height: 600,
-    fps: 60
+    fps: 90
 });
 
 game.start();

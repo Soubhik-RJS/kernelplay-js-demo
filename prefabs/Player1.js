@@ -20,7 +20,8 @@ export class Player1 extends Entity {
             position: { x, y },
         }));
         this.addComponent("rigidbody2d",new Rigidbody2DComponent({
-            useGravity: false
+            mass: 1,
+            gravityScale: 1
         }));
         this.addComponent("collider", new ColliderComponent());
         this.addComponent("renderer", new WebGLBoxRender2D({color:"blue"}));

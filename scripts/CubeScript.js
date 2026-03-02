@@ -6,6 +6,9 @@ export class CubeScript extends ScriptComponent {
     onStart() {
         const renderer = this.entity.scene.game.renderer;
 
+        renderer.camera.position.x = 0;
+        renderer.camera.position.y = 3;
+        renderer.camera.position.z = 7;
         // OrbitControls
         const controls = new OrbitControls(renderer.camera, renderer.renderer.domElement);
         controls.enableDamping = true;       // smooth motion
@@ -17,6 +20,7 @@ export class CubeScript extends ScriptComponent {
     update(dt) {
         const transform = this.entity.getComponent("transform");
         const rb = this.entity.getComponent("rigidbody");
+        // this.rb = rb;
 
         rb.velocity.x = 0;
         rb.velocity.z = 0;
@@ -43,11 +47,19 @@ export class CubeScript extends ScriptComponent {
                 // console.log("Clicked:", hit);
             }
         }
+
+        // if (rb.isGrounded || true) {
+        //     if (Keyboard.isPressed(" ")) {
+        //         rb.addForce(0, 100, "impulse");
+        //         this.isGround = false;
+        //     }
+        // }
     }
 
     onCollision(other) {
         // Called when a solid collision occurs
-        console.log("Player hit:", other.name);
+        // console.log("Player hit:", other.name);
+        // this.rb.velocity.y = 0;
     }
 
     onTriggerEnter(other) {
