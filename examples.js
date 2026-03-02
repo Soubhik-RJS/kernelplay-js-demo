@@ -19,6 +19,13 @@ if (settingsBtn && settingsDropdown) {
     e.stopPropagation();
     settingsDropdown.classList.toggle('hidden');
   });
+
+  // Prevent dropdown from closing when clicking inside
+if (settingsDropdown) {
+  settingsDropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+}
   
   // Close dropdown when clicking outside
   document.addEventListener('click', () => {
