@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Physics System — KernelPlay.js</title>
+  <title>Prop Injection System — KernelPlay.js</title>
   
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
 <style>
@@ -144,130 +144,75 @@
     <p style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Documentation</p>
     <nav class="doc-nav">
       <a href="../getting-started" class="">Getting Started</a>
-<a href="../core-concepts" class="">Core Concepts</a>
-<a href="../components" class="">Components</a>
-<a href="../renderers" class="">Renderers</a>
-<a href="../physics" class=" active">Physics</a>
-<a href="../input" class="">Input System</a>
-<a href="../lifecycle" class="">Script Lifecycle</a>
-<a href="../api" class="">API Reference</a>
-</nav>
+      <a href="../core-concepts" class="">Core Concepts</a>
+      <a href="../components" class="">Components</a>
+      <a href="../renderers" class="">Renderers</a>
+      <a href="../physics" class="">Physics</a>
+      <a href="../input" class="">Input System</a>
+      <a href="../helper-classes" class="">Helper Classes</a>
+      <a href="../multiple-cameras" class="">Multiple Cameras Setup</a>
+      <a href="../prop-injection" class=" active">Prop Injection System</a>
+      <a href="../lifecycle" class="">Script Lifecycle</a>
+      <a href="../api" class="">API Reference</a>
+    </nav>
   </div>
 </aside>
 
     <main style="flex:1;max-width:860px;">
       <div class="glass" style="border-radius:20px;padding:48px;border:1px solid #e0e7ff;box-shadow:0 4px 30px rgba(99,102,241,.1);">
         
-<h1 class="page-title gradient-text">Physics System</h1>
-<p style="color:#6b7280;font-size:1.05rem;margin-bottom:32px;">Built-in 2D physics with collision detection, rigidbodies, and gravity.</p>
+<h1 class="page-title gradient-text">⚡ Prop Injection System</h1>
+<p style="color:#6b7280;font-size:1.05rem;margin-bottom:16px;"><b>ScriptComponent</b> now supports <b>automatic prop injection</b>.</p>
+<p style="color:#6b7280;font-size:1.05rem;margin-bottom:32px;">You can directly pass references and values — no manual lookup needed.</p>
 
-<h2 class="section-title">Physics-Enabled Entity</h2>
-<p style="color:#374151;margin-bottom:12px;">Combine a <code class="inline">Rigidbody2DComponent</code> and <code class="inline">ColliderComponent</code> to get full physics.</p>
-
+<h2 class="section-title">🔗 Setup</h2>
 <div class="code-wrap">
   <div class="code-header">
     <span class="code-lang">js</span>
-    <button class="copy-btn" onclick="copyCode('phys-entity')">
+    <button class="copy-btn" onclick="copyCode('setup-code')">
       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
       Copy
     </button>
   </div>
-  <pre><code id="phys-entity" class="language-js">const player = new Entity("Player");
+  <pre><code id="setup-code" class="language-js">import { ref } from "kernelplay-js";
 
-player.addComponent("transform", new TransformComponent({
-  position: { x: 400, y: 100 }
+player.addComponent("playerController", new PlayerController({
+  enemy: ref(5),
+  force: 800,
+  camera1: ref(100),
+  camera2: ref(101),
 }));
-player.addComponent("rigidbody2d", new Rigidbody2DComponent({
-  useGravity: true,
-  mass: 1,
-  drag: 0.02
-}));
-player.addComponent("collider", new ColliderComponent());
-
-scene.addEntity(player);</code></pre>
+</code></pre>
 </div>
 
+<hr style="margin: 32px 0; border-color: #e0e7ff;">
 
-<h2 class="section-title" style="margin-top:36px;">Controlling Physics in Scripts</h2>
-
+<h2 class="section-title">🚀 Usage</h2>
 <div class="code-wrap">
   <div class="code-header">
     <span class="code-lang">js</span>
-    <button class="copy-btn" onclick="copyCode('phys-script')">
+    <button class="copy-btn" onclick="copyCode('usage-code')">
       <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
       Copy
     </button>
   </div>
-  <pre><code id="phys-script" class="language-js">class PlayerController extends ScriptComponent {
-  update(dt) {
-    const rb = this.entity.getComponent("rigidbody2d");
-    const speed = 200;
+  <pre><code id="usage-code" class="language-js">// Use injected values directly
+if (Keyboard.isPressed(KeyCode.ArrowRight)) {
+  rb.addForce(this.force, 0);
+}
 
-    // Horizontal movement
-    if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = speed;
-    else if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -speed;
-    else rb.velocity.x *= 0.8; // friction
+// Switch camera
+this.setPrimaryCamera(this.camera2);
 
-    // Jump — only when on ground
-    if (Keyboard.wasPressed("Space") && this.isGrounded) {
-      rb.velocity.y = -420;
-    }
-  }
+// Destroy referenced entity
+this.enemy.destroy();
 
-  onCollision(other) {
-    // Detect ground
-    if (other.tag === "ground") this.isGrounded = true;
-    if (other.name === "Enemy") other.destroy();
-  }
-}</code></pre>
+// Change camera target
+this.camera2.getComponent("camera").setTarget(this.enemy);
+</code></pre>
 </div>
 
-
-<h2 class="section-title" style="margin-top:36px;">Trigger Colliders</h2>
-<p style="color:#374151;margin-bottom:12px;">Set <code class="inline">isTrigger: true</code> on a collider to detect overlap without physical response.</p>
-
-<div class="code-wrap">
-  <div class="code-header">
-    <span class="code-lang">js</span>
-    <button class="copy-btn" onclick="copyCode('trigger-code')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
-      Copy
-    </button>
-  </div>
-  <pre><code id="trigger-code" class="language-js">// Coin entity
-const coin = new Entity("Coin");
-coin.addComponent("collider", new ColliderComponent({
-  width: 20, height: 20,
-  isTrigger: true        // ← no push, just events
-}));
-coin.addComponent("script", new class extends ScriptComponent {
-  onTriggerEnter(other) {
-    if (other.tag === "player") {
-      score += 10;
-      this.entity.destroy();
-    }
-  }
-}());</code></pre>
-</div>
-
-
-<h2 class="section-title" style="margin-top:36px;">Physics Properties</h2>
-<table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-  <thead><tr style="background:#eef2ff;">
-    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#3730a3;">Property</th>
-    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#3730a3;">Type</th>
-    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#3730a3;">Description</th>
-  </tr></thead>
-  <tbody>
-    <tr style="border-bottom:1px solid #e0e7ff;"><td style="padding:10px 14px;"><code class="inline">mass</code></td><td style="padding:10px 14px;color:#6b7280;">number</td><td style="padding:10px 14px;color:#374151;">Affects force response (default: 1)</td></tr>
-    <tr style="border-bottom:1px solid #e0e7ff;"><td style="padding:10px 14px;"><code class="inline">gravityScale</code></td><td style="padding:10px 14px;color:#6b7280;">number</td><td style="padding:10px 14px;color:#374151;">Multiplier on world gravity (default: 1)</td></tr>
-    <tr style="border-bottom:1px solid #e0e7ff;"><td style="padding:10px 14px;"><code class="inline">drag</code></td><td style="padding:10px 14px;color:#6b7280;">number</td><td style="padding:10px 14px;color:#374151;">Air resistance (0–1, default: 0.05)</td></tr>
-    <tr style="border-bottom:1px solid #e0e7ff;"><td style="padding:10px 14px;"><code class="inline">isKinematic</code></td><td style="padding:10px 14px;color:#6b7280;">boolean</td><td style="padding:10px 14px;color:#374151;">Script-driven, ignores gravity/forces</td></tr>
-    <tr><td style="padding:10px 14px;"><code class="inline">velocity</code></td><td style="padding:10px 14px;color:#6b7280;">{x, y}</td><td style="padding:10px 14px;color:#374151;">Current velocity vector</td></tr>
-  </tbody>
-</table>
-
-        <div class="prev-next"><a href="../renderers" class="pn-btn"><span class="pn-label">← Previous</span><span class="pn-title">Renderers</span></a><a href="../input" class="pn-btn next"><span class="pn-label">Next →</span><span class="pn-title">Input System</span></a></div>
+        <div class="prev-next"><a href="../multiple-cameras" class="pn-btn"><span class="pn-label">← Previous</span><span class="pn-title">Multiple Cameras Setup</span></a><a href="../lifecycle" class="pn-btn next"><span class="pn-label">Next →</span><span class="pn-title">Script Lifecycle</span></a></div>
       </div>
     </main>
   </div>
