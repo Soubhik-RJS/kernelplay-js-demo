@@ -7,12 +7,12 @@ export class Level3 extends Scene {
     this.addEntity(new PlayerCube(0, 3, 0));
 
     this.addEntity(new Cube(0, 0, 0, "Ground"));
-    this.addEntity(new Cube(5, -2, 0, "Ground"));
-    this.addEntity(new Cube(-5, 2, 0, "Ground"));
-    this.addEntity(new Cube(0, -3, 0, "Ground"));
-    this.addEntity(new Cube(0, 5, 0, "Ground"));
+    this.addEntity(new Cube(5, -3, 0, "Ground"));
+    this.addEntity(new Cube(-5, 3, 0, "Ground"));
+    this.addEntity(new Cube(0, -5, 0, "Ground"));
+    this.addEntity(new Cube(0, 6, 0, "Ground"));
 
-    this.addEntity(new Cube(0, 6, 0, "Coin"));
-    this.addEntity(new Cube(0, -2, 0, "Coin"));
+    this.addEntity(new Cube(0, 7, 0, "Coin"));
+    this.addEntity(new Cube(0, -4, 0, "Coin"));
   }
 }

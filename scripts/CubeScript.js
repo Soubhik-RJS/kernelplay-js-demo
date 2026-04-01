@@ -48,22 +48,21 @@ export class CubeScript extends ScriptComponent {
             }
         }
 
-        // if (rb.isGrounded || true) {
-        //     if (Keyboard.isPressed(" ")) {
-        //         rb.addForce(0, 100, "impulse");
-        //         this.isGround = false;
-        //     }
-        // }
-    }
+        if (rb.isGrounded) {
+            if (Keyboard.isPressed(" ")) {
+                rb.addForce(0, 20, 0, "impulse");
+            }
+        }
 
-    onCollision(other) {
-        // Called when a solid collision occurs
-        // console.log("Player hit:", other.name);
-        // this.rb.velocity.y = 0;
+        if(transform.position.y < -20) {
+            transform.setPosition(0, 3, 0);
+        }
     }
 
     onTriggerEnter(other) {
-        // Called when entering a trigger collider
-        console.log("Player entered trigger:", other.name);
+        if(other.tag === "coin"){
+            other.destroy();
+            console.log("Coin collected !!!");
+        }
     }
 }

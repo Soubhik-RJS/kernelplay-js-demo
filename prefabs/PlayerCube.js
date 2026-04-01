@@ -26,7 +26,8 @@ export function PlayerCube(x, y, z = 0) {
   e.addComponent("mesh", new MeshComponent(mesh));
   e.addComponent("collider3D", new BoxCollider3D());
   e.addComponent("rigidbody", new RigidbodyComponent({
-    useGravity: false
+    gravityScale: 0.05,
+    useGravity: true
   }));
   e.addComponent("CubeScript", new CubeScript());
 
