@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Animation System — KernelPlay.js</title>
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"/>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .glass { background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); }
+  .gradient-text { background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .doc-nav a { display:block; padding:8px 16px; border-radius:8px; color:#374151; transition:all .2s; text-decoration:none; margin-bottom:4px; font-size:0.9rem; }
+  .doc-nav a:hover { background:#eef2ff; color:#4f46e5; }
+  .doc-nav a.active { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:white !important; }
+  .copy-btn { font-size:0.75rem; color:#9ca3af; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:4px; transition:all .2s; display:flex; align-items:center; gap:4px; }
+  .copy-btn:hover { color:white; background:#374151; }
+  .code-wrap { background:#282c34; border-radius:8px; overflow:hidden; margin:12px 0; }
+  .code-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background:#21252b; border-bottom:1px solid #3a3f4b; }
+  .code-lang { font-size:0.7rem; color:#5c6370; font-family:monospace; }
+  .code-wrap pre { margin:0; padding:16px; overflow-x:auto; }
+  .code-wrap pre code.hljs { background:transparent; padding:0; font-size:0.82rem; line-height:1.6; }
+  .prev-next { display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:2px solid #e0e7ff; gap:16px; }
+  .pn-btn { flex:1; padding:16px; border-radius:12px; border:2px solid #e0e7ff; background:white; cursor:pointer; text-decoration:none; color:#374151; transition:all .2s; }
+  .pn-btn:hover { border-color:#6366f1; background:#eef2ff; }
+  .pn-btn.next { text-align:right; }
+  .pn-label { font-size:0.7rem; color:#9ca3af; text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:4px; }
+  .pn-title { font-weight:700; color:#4f46e5; font-size:0.95rem; }
+  .nav-top { position:fixed; top:0; left:0; right:0; z-index:50; }
+  .section-title { font-size:1.9rem; font-weight:800; color:#111827; margin-bottom:1.5rem; padding-bottom:.5rem; border-bottom:2px solid #e0e7ff; }
+  .page-title { font-size:2.6rem; font-weight:800; margin-bottom:1rem; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:0.75rem; font-weight:600; }
+  code.inline { background:#f3f4f6; padding:2px 7px; border-radius:5px; font-size:0.82rem; font-family:monospace; color:#4f46e5; }
+  .info-card { padding:20px; border-radius:12px; border:1px solid; margin-bottom:16px; }
+</style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#6366f1',
+            'secondary': '#8b5cf6',
+            'accent': '#ec4899',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .code-block {
+        background: #1e1e1e;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .doc-nav a {
+        transition: all 0.2s;
+      }
+      
+      .doc-nav a.active {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+      }
+    }
+  </style>
+</head>
+<body style="background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 50%,#fdf2f8 100%);min-height:100vh;">
+  
+<!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-indigo-200 shadow-lg">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-2 group">
+                    <div 
+                        class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                        <span class="text-white font-bold text-xl">K</span>
+                    </div>
+                    <span class="text-xl font-bold gradient-text hidden sm:inline">KernelPlay.js</span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="../../" class="text-gray-700 hover:text-indigo-600 transition-colors">Home</a>
+                    <a href="../../docs" class="text-indigo-600 font-semibold">Docs</a>
+                    <a href="../../examples" class="text-gray-700 hover:text-indigo-600 transition-colors">Examples</a>
+                    <a href="../../about" class="text-gray-700 hover:text-indigo-600 transition-colors">About</a>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="https://github.com/Soubhik1000/kernelplay" target="_blank"
+                        class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                        </svg>
+                        <span class="font-medium">GitHub</span>
+                    </a>
+
+                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-indigo-100 transition-colors">
+                        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-indigo-200 bg-white/95 backdrop-blur-lg">
+            <div class="container mx-auto px-4 py-4 space-y-3">
+                <a href="../../"
+                    class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">Home</a>
+                <a href="../../docs"
+                    class="block px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold">Docs</a>
+                <a href="../../examples"
+                    class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">Examples</a>
+                <a href="../../about"
+                    class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">About</a>
+            </div>
+        </div>
+    </nav>
+
+  <div style="max-width:1280px;margin:0 auto;padding:88px 24px 60px;display:flex;gap:32px;">
+    
+<aside style="width:240px;flex-shrink:0;">
+  <div class="glass" style="position:sticky;top:84px;border-radius:16px;padding:20px;border:1px solid #e0e7ff;box-shadow:0 4px 20px rgba(99,102,241,.08);">
+    <p style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Documentation</p>
+    <nav class="doc-nav">
+<a href="../getting-started" class="">Getting Started</a>
+<a href="../core-concepts" class="">Core Concepts</a>
+<a href="../components" class="">Components</a>
+<a href="../renderers" class="">Renderers</a>
+<a href="../physics" class="">Physics</a>
+<a href="../input" class="">Input System</a>
+<a href="../helper-classes" class="">Helper Classes</a>
+<a href="../multiple-cameras" class="">Multiple Cameras Setup</a>
+<a href="../prop-injection" class="">Prop Injection System</a>
+<a href="../lifecycle" class="">Script Lifecycle</a>
+<a href="../animation" class=" active">Advanced Animation</a>
+<a href="../sprites" class="">Sprite Management</a>
+<a href="../api" class="">API Reference</a>
+</nav>
+  </div>
+</aside>
+
+    <main style="flex:1;max-width:860px;">
+      <div class="glass" style="border-radius:20px;padding:48px;border:1px solid #e0e7ff;box-shadow:0 4px 30px rgba(99,102,241,.1);">
+        <h1 class="page-title gradient-text">Animation System</h1>
+        <p style="color:#6b7280;font-size:1.05rem;margin-bottom:32px;">Full reference for <code class="inline">AnimationClip</code>, <code class="inline">AnimatorController</code>, and <code class="inline">AnimatorComponent</code>.</p>
+
+        <h2 class="section-title" id="overview">Overview</h2>
+        <p style="color:#374151;margin-bottom:12px;">The animation system has three layers:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">text</span>
+            <button class="copy-btn" onclick="copyCode('overview-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="overview-code" class="language-text">AnimationClip        — pure data (frames, tracks, timing)
+AnimatorController   — state machine (states, transitions, parameters)
+AnimatorComponent    — runtime (attached to entity, drives sprite or 3D properties)</code></pre>
+        </div>
+        <p style="color:#374151;margin-bottom:32px;">You create clips, register them as states in a controller, then attach the controller to an <code class="inline">AnimatorComponent</code> on your entity. The component evaluates transitions automatically every frame based on parameters you feed it.</p>
+
+        <h2 class="section-title" id="animationclip">AnimationClip</h2>
+        <p style="color:#374151;margin-bottom:12px;">A pure data object describing a single animation. Has no logic of its own.</p>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Constructor</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animationclip-constructor-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animationclip-constructor-code" class="language-js">import { AnimationClip } from "kernelplay-js";
+
+const clip = new AnimationClip({
+  name:        "walk",     // string — clip identifier
+  frameRate:   12,         // frames per second
+  loop:        true,       // loop when finished
+  length:      null,       // seconds — auto-calculated if null
+
+  // 2D sprite sheet options
+  frames:      [],         // array of frame indices or { x, y, w, h } objects
+  gridWidth:   1,          // number of columns in the sprite sheet
+  frameWidth:  32,         // width of one frame in pixels
+  frameHeight: 32,         // height of one frame in pixels
+
+  // 3D / property animation
+  tracks:      {},         // { "component.property": [ {time, value}, ... ] }
+});</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Frame formats</h3>
+        <p style="color:#374151;margin-bottom:12px;"><strong>Numeric index</strong> — KernelPlayJS calculates the source rect from the grid:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animationclip-numeric-frame-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animationclip-numeric-frame-code" class="language-js">// sprite sheet with 8 columns, 32x32 frames
+const walkClip = new AnimationClip({
+  frames:     [8, 9, 10, 11, 12, 13],
+  gridWidth:  8,
+  frameWidth:  32,
+  frameHeight: 32,
+  frameRate:  12,
+  loop:       true,
+});</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;"><strong>Explicit rect</strong> — give exact pixel coordinates per frame:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animationclip-explicit-rect-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animationclip-explicit-rect-code" class="language-js">const walkClip = new AnimationClip({
+  frames: [
+    { x: 0,   y: 32, w: 32, h: 32 },
+    { x: 32,  y: 32, w: 32, h: 32 },
+    { x: 64,  y: 32, w: 32, h: 32 },
+  ],
+  frameRate: 12,
+  loop: true,
+});</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Manual length</h3>
+        <p style="color:#374151;margin-bottom:12px;">For single-frame clips or clips you want to hold longer than the frames dictate:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animationclip-manual-length-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animationclip-manual-length-code" class="language-js">const jumpClip = new AnimationClip({
+  frames:    [16],   // single frame
+  frameRate: 10,
+  loop:      false,
+  length:    0.5,    // hold for 0.5 seconds regardless of frame count
+});</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Methods</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animationclip-methods-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animationclip-methods-code" class="language-js">// Get source rect for a frame index — used internally by AnimatorComponent
+clip.getFrameRect(frameIndex);
+// returns { x, y, w, h } or null
+
+// Sample a property track at a given time (linear interpolation)
+clip.sampleTrack("transform.position.x", 0.75);
+// returns interpolated value or null
+
+// Serialization
+clip.toJSON();
+AnimationClip.fromJSON(data);</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="animatorcontroller">AnimatorController</h2>
+        <p style="color:#374151;margin-bottom:12px;">The state machine. Holds states, transitions, and parameters. No entity needed — it is just data + logic.</p>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Constructor</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-constructor-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-constructor-code" class="language-js">import { AnimatorController } from "kernelplay-js";
+
+const controller = new AnimatorController();</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">addState(name, clip, options)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Register a clip as a named state.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-addstate-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-addstate-code" class="language-js">controller.addState("idle", idleClip);
+
+// With options
+controller.addState("walk", walkClip, {
+  speed:  1.5,    // play clip faster (multiplies frameRate)
+  mirror: false,  // reserved for future flip support
+  tag:    "locomotion",  // optional tag for grouping
+});</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">The first state added automatically becomes <code class="inline">entryState</code> (the default starting state).</p>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">addParameter(name, type, defaultValue)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Parameters drive transitions. Four types: <code class="inline">"bool"</code>, <code class="inline">"float"</code>, <code class="inline">"int"</code>, <code class="inline">"trigger"</code>.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-addparameter-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-addparameter-code" class="language-js">controller.addParameter("speed",      "float",   0);
+controller.addParameter("isGrounded", "bool",    false);
+controller.addParameter("jump",       "trigger", false);
+controller.addParameter("health",     "int",     100);</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">A <strong>trigger</strong> is a bool that resets itself to <code class="inline">false</code> automatically after it fires a transition.</p>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">addTransition(from, to, options)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Add a transition between two states.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-addtransition-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-addtransition-code" class="language-js">controller.addTransition("idle", "walk", {
+  conditions:  [],      // array of condition objects (see below)
+  hasExitTime: false,   // if true, transition waits until exitTime is reached
+  exitTime:    1.0,     // normalized time (0–1) within clip before transition fires
+  duration:    0,       // crossfade seconds (0 = instant)
+  priority:    0,       // higher = evaluated first
+});</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">addAnyStateTransition(to, options)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Fires from any state — useful for jump, hurt, death.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-addanystatetransition-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-addanystatetransition-code" class="language-js">controller.addAnyStateTransition("jump", {
+  conditions:  [{ param: "jump", op: "trigger" }],
+  hasExitTime: false,
+  priority:    10,
+});</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">setParameter / setTrigger / getParameter</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-setgetparam-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-setgetparam-code" class="language-js">controller.setParameter("speed", 3.5);
+controller.setParameter("isGrounded", true);
+controller.setTrigger("jump");          // sets trigger = true, consumed on next transition
+controller.resetTrigger("jump");        // manually reset without firing
+controller.getParameter("speed");       // returns current value</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Serialization</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcontroller-serialization-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcontroller-serialization-code" class="language-js">controller.toJSON();
+AnimatorController.fromJSON(data, clipFromJSON);</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="animatorcomponent">AnimatorComponent</h2>
+        <p style="color:#374151;margin-bottom:12px;">The runtime component. Attach it to an entity. It updates every frame, evaluates transitions, and applies frames to <code class="inline">SpriteComponent</code> or properties via tracks.</p>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Constructor</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-constructor-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-constructor-code" class="language-js">import { AnimatorComponent } from "kernelplay-js";
+
+entity.addComponent("animator", new AnimatorComponent({
+  controller:       myController,  // AnimatorController instance
+  autoPlay:         true,          // enter entryState on init()
+  speed:            1.0,           // global playback speed multiplier
+}));</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">play(stateName, reset)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Immediately jump to a state. Bypasses transition conditions.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-play-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-play-code" class="language-js">animator.play("idle");
+animator.play("walk");
+
+// Don't restart if already in this state
+animator.play("walk", false);</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">crossFade(stateName, duration)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Smoothly transition to a state over <code class="inline">duration</code> seconds.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-crossfade-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-crossfade-code" class="language-js">animator.crossFade("idle", 0.15);  // 150ms blend
+animator.crossFade("run",  0.2);</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">setParameter(name, value)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Feed a value to the controller — drives automatic transitions.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-setparam-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-setparam-code" class="language-js">animator.setParameter("speed",      rb.velocity.x !== 0 ? 1 : 0);
+animator.setParameter("isGrounded", rb.isGrounded);
+animator.setParameter("health",     this.health);</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">setTrigger(name)</h3>
+        <p style="color:#374151;margin-bottom:12px;">Fire a one-shot trigger. Consumed automatically after the transition fires.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-settrigger-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-settrigger-code" class="language-js">animator.setTrigger("jump");
+animator.setTrigger("attack");
+animator.setTrigger("hurt");</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">stop / pause / resume</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-stop-pause-resume-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-stop-pause-resume-code" class="language-js">animator.stop();    // stop playback, hold current frame
+animator.pause();   // same as stop
+animator.resume();  // continue from where it stopped</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Getters</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('animatorcomponent-getters-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="animatorcomponent-getters-code" class="language-js">animator.currentState   // string — current state name
+animator.isPlaying      // bool
+animator.isInState("walk")  // bool — true if currently in named state
+animator.getParameter("speed")  // returns parameter value</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="parameters--conditions">Parameters &amp; Conditions</h2>
+        <p style="color:#374151;margin-bottom:12px;">Conditions are objects with three fields: <code class="inline">param</code>, <code class="inline">op</code>, <code class="inline">value</code>.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">markdown</span>
+            <button class="copy-btn" onclick="copyCode('parameters-conditions-table-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="parameters-conditions-table-code" class="language-markdown">| op        | type    | description                              |
+|-----------|---------|------------------------------------------|
+| `"true"`  | bool    | param is true                            |
+| `"false"` | bool    | param is false                           |
+| `"&gt;"`     | float/int | param greater than value               |
+| `"&lt;"`     | float/int | param less than value                  |
+| `"&gt;="`    | float/int | param greater than or equal to value   |
+| `"&lt;="`    | float/int | param less than or equal to value      |
+| `"=="`    | any     | param equals value                       |
+| `"!="`    | any     | param does not equal value               |
+| `"trigger"` | trigger | fires and auto-resets                  |</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('parameters-conditions-example-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="parameters-conditions-example-code" class="language-js">// Multiple conditions — ALL must be true for transition to fire
+.addTransition("idle", "walk", {
+  conditions: [
+    { param: "speed",      op: "&gt;",    value: 0.1 },
+    { param: "isGrounded", op: "true"             },
+  ],
+})</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="transitions">Transitions</h2>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Instant transition (most common)</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('transitions-instant-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="transitions-instant-code" class="language-js">.addTransition("idle", "walk", {
+  conditions:  [{ param: "speed", op: "&gt;", value: 0.1 }],
+  hasExitTime: false,
+  duration:    0,
+})</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Wait for clip to finish (hasExitTime)</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('transitions-exit-time-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="transitions-exit-time-code" class="language-js">// Transition after 95% of the clip has played
+.addTransition("jump", "idle", {
+  hasExitTime: true,
+  exitTime:    0.95,
+  duration:    0,
+})</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Wait for clip to finish AND condition</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('transitions-exit-time-condition-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="transitions-exit-time-condition-code" class="language-js">.addTransition("jump", "idle", {
+  conditions:  [{ param: "isGrounded", op: "true" }],
+  hasExitTime: false,  // condition alone is enough
+  duration:    0,
+})</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">Crossfade transition</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('transitions-crossfade-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="transitions-crossfade-code" class="language-js">.addTransition("walk", "run", {
+  conditions: [{ param: "speed", op: "&gt;", value: 5 }],
+  duration:   0.15,  // 150ms blend between states
+})</code></pre>
+        </div>
+
+        <h3 style="font-size:1.4rem; font-weight:700; color:#111827; margin-top:24px; margin-bottom:12px;">AnyState transition (trigger, hurt, death)</h3>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('transitions-anystate-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="transitions-anystate-code" class="language-js">// Fires from any state — highest priority
+.addAnyStateTransition("death", {
+  conditions: [{ param: "isDead", op: "true" }],
+  priority:   100,
+})</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="callbacks">Callbacks</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('callbacks-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="callbacks-code" class="language-js">const animator = entity.getComponent("animator");
+
+// Fires when entering a new state
+animator.onStateEnter = (stateName) =&gt; {
+  if (stateName === "jump") rb.addForce(0, -300, "impulse");
+  if (stateName === "attack") this.hitbox.enabled = true;
+};
+
+// Fires when exiting a state
+animator.onStateExit = (stateName) =&gt; {
+  if (stateName === "attack") this.hitbox.enabled = false;
+};
+
+// Fires when a non-looping clip finishes
+animator.onAnimationEnd = (stateName) =&gt; {
+  if (stateName === "death") this.entity.destroy();
+  if (stateName === "attack") animator.play("idle");
+};</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="3d-property-animation">3D Property Animation</h2>
+        <p style="color:#374151;margin-bottom:12px;">No sprite needed. Tracks drive any component property directly using dot-path notation: <code class="inline">"componentKey.property.subproperty"</code>.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('3d-property-animation-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="3d-property-animation-code" class="language-js">const bobClip = new AnimationClip({
+  name:   "bob",
+  loop:   true,
+  length: 1.5,
+  tracks: {
+    "transform.position.y": [
+      { time: 0.0,  value: 0   },
+      { time: 0.75, value: 1.5 },
+      { time: 1.5,  value: 0   },
+    ],
+  },
+});
+
+const spinClip = new AnimationClip({
+  name:   "spin",
+  loop:   true,
+  length: 2.0,
+  tracks: {
+    "transform.rotation.y": [
+      { time: 0.0, value: 0            },
+      { time: 2.0, value: Math.PI * 2  },
+    ],
+  },
+});
+
+// Animate alpha on a sprite
+const fadeClip = new AnimationClip({
+  name:   "fade",
+  loop:   false,
+  length: 1.0,
+  tracks: {
+    "sprite.alpha": [
+      { time: 0.0, value: 1 },
+      { time: 1.0, value: 0 },
+    ],
+  },
+});</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">Track values are linearly interpolated between keyframes. Supported value types: <code class="inline">number</code>, <code class="inline">{ x, y, z }</code> vectors, arrays.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('3d-property-animation-vector-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="3d-property-animation-vector-code" class="language-js">// Animate a full position vector
+const moveClip = new AnimationClip({
+  name:   "move",
+  loop:   false,
+  length: 2.0,
+  tracks: {
+    "transform.position": [
+      { time: 0.0, value: { x: 0,   y: 0,  z: 0  } },
+      { time: 1.0, value: { x: 100, y: 50, z: 0  } },
+      { time: 2.0, value: { x: 200, y: 0,  z: 0  } },
+    ],
+  },
+});</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">Attach exactly like 2D — no sprite component required:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('3d-property-animation-attach-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="3d-property-animation-attach-code" class="language-js">const ac = new AnimatorController()
+  .addState("bob", bobClip);
+
+entity.addComponent("animator", new AnimatorComponent({ controller: ac }));</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="static-animation">Static Animation</h2>
+        <p style="color:#374151;margin-bottom:12px;">A "static animation" is a clip with a single frame used to set a pose or hold a visual state.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('static-animation-2d-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="static-animation-2d-code" class="language-js">// Single frame — holds at that frame forever (loop: true means it just stays)
+const crouchClip = new AnimationClip({
+  name:      "crouch",
+  frames:    [24],      // frame 24 on the sprite sheet
+  frameRate: 1,
+  loop:      true,
+  gridWidth:  8,
+  frameWidth:  32,
+  frameHeight: 32,
+});
+
+controller.addState("crouch", crouchClip);</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">For 3D, a static animation holds a transform at a fixed value:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('static-animation-3d-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="static-animation-3d-code" class="language-js">const openDoorClip = new AnimationClip({
+  name:   "open",
+  loop:   false,
+  length: 0.0001,  // near-zero length
+  tracks: {
+    "transform.rotation.y": [
+      { time: 0, value: Math.PI / 2 },  // 90 degrees — held
+    ],
+  },
+});</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">Or use <code class="inline">play()</code> directly and <code class="inline">stop()</code> to freeze on a frame:</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('static-animation-play-stop-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="static-animation-play-stop-code" class="language-js">animator.play("crouch");
+animator.stop();   // freezes on the first frame of crouch immediately</code></pre>
+        </div>
+
+        <h2 class="section-title" style="margin-top:36px;" id="legacy-shorthand">Legacy Shorthand</h2>
+        <p style="color:#374151;margin-bottom:12px;">If you don't need a state machine, pass <code class="inline">animations</code> and <code class="inline">defaultAnimation</code> directly. A simple controller is built for you automatically — all existing code keeps working with zero changes.</p>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('legacy-shorthand-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="legacy-shorthand-code" class="language-js">entity.addComponent("animator", new AnimatorComponent({
+  animations: {
+    idle: {
+      frames:      [0, 1, 2, 3],
+      frameRate:   8,
+      loop:        true,
+      gridWidth:   8,
+      frameWidth:  32,
+      frameHeight: 32,
+    },
+    walk: {
+      frames:      [8, 9, 10, 11],
+      frameRate:   12,
+      loop:        true,
+      gridWidth:   8,
+      frameWidth:  32,
+      frameHeight: 32,
+    },
+  },
+  defaultAnimation: "idle",
+}));
+
+// Manual control — no parameters needed
+animator.play("walk");
+animator.play("idle");</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;">No transitions are added in this mode — you call <code class="inline">play()</code> yourself.</p>
+
+        <h2 class="section-title" style="margin-top:36px;" id="full-example--platformer-player">Full Example — Platformer Player</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('full-example-platformer-player-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2"/></svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="full-example-platformer-player-code" class="language-js">import { AnimationClip }      from "kernelplay-js";
+import { AnimatorController } from "kernelplay-js";
+import { AnimatorComponent }  from "kernelplay-js";
+import { ScriptComponent }    from "kernelplay-js";
+import { Keyboard, KeyCode }  from "kernelplay-js";
+import { SpriteComponent }    from "kernelplay-js";
+
+export class PlayerScript extends ScriptComponent {
+  onAttach() {
+    this.rb       = this.entity.getComponent("rigidbody2d");
+    this.sprite   = this.entity.getComponent("sprite");
+    this.animator = this.entity.getComponent("animator");
+
+    // Callbacks
+    this.animator.onStateEnter = (state) =&gt; {
+      if (state === "hurt") this.rb.addForce(0, -300, "impulse");
+    };
+    this.animator.onAnimationEnd = (state) =&gt; {
+      if (state === "hurt") this.animator.play("idle");
+    };
+  }
+
+  update(dt) {
+    this.rb.velocity.x = 0;
+
+    if (Keyboard.isPressed(KeyCode.ArrowRight)) {
+      this.rb.velocity.x  = 200;
+      this.sprite.flipX   = false;
+    }
+    if (Keyboard.isPressed(KeyCode.ArrowLeft)) {
+      this.rb.velocity.x  = -200;
+      this.sprite.flipX   = true;
+    }
+
+    // Feed parameters every frame
+    this.animator.setParameter("speed",      this.rb.velocity.x !== 0 ? 1 : 0);
+    this.animator.setParameter("isGrounded", this.rb.isGrounded);
+
+    // Jump
+    if (this.rb.isGrounded && Keyboard.isPressed(KeyCode.Space)) {
+      this.rb.addForce(0, -600, "impulse");
+      this.animator.setTrigger("jump");
+    }
+  }
+
+  takeDamage() {
+    this.animator.setTrigger("hurt");
+  }
+}
+
+// ── Build clips ───────────────────────────────────────────────────────────────
+
+const GRID = { gridWidth: 8, frameWidth: 32, frameHeight: 32 };
+
+const idleClip = new AnimationClip({ name: "idle",  frames: [0,1,2,3],         frameRate: 8,  loop: true,  ...GRID });
+const walkClip = new AnimationClip({ name: "walk",  frames: [8,9,10,11,12,13], frameRate: 12, loop: true,  ...GRID });
+const jumpClip = new AnimationClip({ name: "jump",  frames: [16],              frameRate: 10, loop: false, length: 0.5, ...GRID });
+const hurtClip = new AnimationClip({ name: "hurt",  frames: [24,25],           frameRate: 10, loop: false, ...GRID });
+
+// ── Build controller ──────────────────────────────────────────────────────────
+
+const controller = new AnimatorController()
+  .addParameter("speed",      "float",   0)
+  .addParameter("isGrounded", "bool",    false)
+  .addParameter("jump",       "trigger")
+  .addParameter("hurt",       "trigger")
+
+  .addState("idle", idleClip)
+  .addState("walk", walkClip)
+  .addState("jump", jumpClip)
+  .addState("hurt", hurtClip)
+
+  // idle ↔ walk (grounded only)
+  .addTransition("idle", "walk", {
+    conditions:  [{ param: "speed", op: "&gt;", value: 0.1 }, { param: "isGrounded", op: "true" }],
+    hasExitTime: false, duration: 0,
+  })
+  .addTransition("walk", "idle", {
+    conditions:  [{ param: "speed", op: "&lt;=", value: 0.1 }],
+    hasExitTime: false, duration: 0,
+  })
+
+  // walk → jump if falls off ledge
+  .addTransition("walk", "jump", {
+    conditions:  [{ param: "isGrounded", op: "false" }],
+    hasExitTime: false, duration: 0,
+  })
+
+  // jump → idle on landing
+  .addTransition("jump", "idle", {
+    conditions:  [{ param: "isGrounded", op: "true" }],
+    hasExitTime: false, duration: 0,
+  })
+
+  // AnyState → jump (trigger, high priority)
+  .addAnyStateTransition("jump", {
+    conditions: [{ param: "jump", op: "trigger" }],
+    hasExitTime: false, priority: 10,
+  })
+
+  // AnyState → hurt (trigger, highest priority)
+  .addAnyStateTransition("hurt", {
+    conditions: [{ param: "hurt", op: "trigger" }],
+    hasExitTime: false, priority: 20,
+  });
+
+// ── Attach to entity ──────────────────────────────────────────────────────────
+
+entity.addComponent("sprite",   new SpriteComponent({ image: "./assets/player.png", width: 32, height: 32 }));
+entity.addComponent("animator", new AnimatorComponent({ controller }));
+entity.addComponent("script",   new PlayerScript());</code></pre>
+        </div>
+
+        <div class="prev-next">
+          <a href="../lifecycle" class="pn-btn"><span class="pn-label">← Previous</span><span class="pn-title">Script Lifecycle</span></a>
+          <a href="../sprites" class="pn-btn next"><span class="pn-label">Next →</span><span class="pn-title">Sprite Management</span></a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../script.js"></script>
+</body>
+</html>
