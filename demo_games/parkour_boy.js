@@ -2,22 +2,16 @@
 // NOTES
 // -----------------------------------------------------------------------------
 //
-// 1. Audio System
-// This game includes a preliminary audio system implementation. It is currently
-// a test version and not part of the official release. The system functions
-// similarly to standard AudioListener and AudioSource components.
-// 
-// The audio system is available for use starting from version v0.3.0.
-// An official and fully supported implementation will be released in v0.3.1.
+// User Interface (UI)
+// The game includes a pre-release UI system starting from version v0.3.3.
+// It is available for use and intended for testing and early development.
 //
-// 2. User Interface (UI)
-// The game includes a temporary UI implementation that is not part of the
-// official system. The UI is currently rendered by overriding the render()
-// method within the scene.
+// The official UI system will be released in version v0.4.0 and will introduce
+// a dedicated UI Canvas for rendering and managing user interface elements.
 //
 // -----------------------------------------------------------------------------
 
-import { BoxRenderComponent, Entity, Game, Random, ref, Scene } from "kernelplay-js";
+import { BoxRenderComponent, Entity, Game, Random, ref, Scene, UIText, UIButton, UIPanel } from "kernelplay-js";
 import {
     TransformComponent,
     CameraComponent,
@@ -119,7 +113,7 @@ function PlayerAnimatorController() {
 
 }
 
-// This is a simpler animator controller for the coins.
+// This is a simpler animator controller for the coins, which just loops through a spinning animation.
 function CoinAnimatorController() {
     const clip = new AnimationClip({
         name: "clip",
@@ -134,7 +128,7 @@ function CoinAnimatorController() {
     return new AnimatorController().addState("clip", clip);
 }
 
-// This is a simpler animator controller for the enemies.
+// This is a simpler animator controller for the enemies, which just loops through a walking animation. It takes a 'skin' parameter to choose between two different enemy spritesheets.
 function EnemyAnimatorController(skin) {
     const walkClip_1 = new AnimationClip({
         frames: [
@@ -203,9 +197,12 @@ class PlayerScript extends ScriptComponent {
 
         this._isRunningSoundPlaying = false;
         this._isJumping = false;
+        this.isLose = false;
     }
 
     update(dt) {
+        if (this.isLose) return;
+
         this.rb.velocity.x = 0;
 
         if (Keyboard.isPressed(KeyCode.ArrowRight)) {
@@ -221,67 +218,35 @@ class PlayerScript extends ScriptComponent {
         this.animator.setParameter("speed", isMoving ? 1 : 0);
         this.animator.setParameter("isGrounded", this.rb.isGrounded);
 
-        if (this.rb.isGrounded) {
-            if (this._isJumping) this._isJumping = false;
-            if (Keyboard.isPressed(KeyCode.Space)) {
-                this.rb.addForce(0, -600, "impulse");
-                this.animator.setTrigger("jump");
-                this.jumpSound();
-                this._isJumping = true;
-            }
+        if (this.rb.isGrounded && Keyboard.wasPressed(KeyCode.Space)) {
+            this.rb.addForce(0, -600, "impulse");
+            this.audio.stopLoop('run');          // cut run sound immediately
+            this.audio.playOneShot('jump', { volume: 0.1 });
+            this.animator.setTrigger("jump");
         }
 
         this.transform.position.x = Mathf.clamp(this.transform.position.x, -710, 710)
 
         if (isMoving && this.rb.isGrounded) {
-            if (!this._isRunningSoundPlaying) {
-                this.runSound();
-                this._isRunningSoundPlaying = true;
-                console.log("running");
-            }
+            this.audio.playLoop('run', { volume: 0.5 });
         } else {
-            if (this._isRunningSoundPlaying) {
-                if (!this._isJumping) this.audio.stopAll();
-                this._isRunningSoundPlaying = false;
-            }
+            this.audio.stopLoop('run');
         }
     }
 
-    runSound() {
-        this.audio.playLoop('./assets/run.mp3', {
-            volume: 0.5,
-        });
-    }
-    jumpSound() {
-        this.audio.stopAll();
-        this.audio.playOneShot('./assets/jump.mp3', {
-            volume: 0.1,
-        });
-    }
-    coinSound() {
-        this.audio.stopAll();
-        this.audio.playOneShot('./assets/coin.wav', {
-            volume: 1,
-        });
-    }
-    hitSound() {
-        this.audio.playOneShot('./assets/lose.wav', {
-            volume: 0.5,
-            position: this.transform.position
-        });
-    }
-
     getKill() {
+        this.isLose = true;
         this.playerCorpse.getComponent("transform").position.x = this.transform.position.x;
         this.playerCorpse.getComponent("transform").position.y = this.transform.position.y;
         this.audio.stopAll();
-        this.hitSound();
+        this.audio.playOneShot('lose', { volume: 0.8 });
         this.destroy();
     }
 
     onCollision(other) {
         if (other.name === "Coin") {
-            this.coinSound();
+            // this.coinSound();
+            this.audio.playOneShot('coin', { volume: 0.8 });
             other.getComponent('transform').position.x = Random.range(-600, 600);
             other.getComponent("transform").position.y = 0;
             console.log("Coin Collected");
@@ -293,6 +258,7 @@ class PlayerScript extends ScriptComponent {
                 other.getComponent('transform').position.x = Random.range(-600, 600);
                 other.getComponent("transform").position.y = 0;
                 console.log("Enemy Kill");
+                this.audio.playOneShot('kill', { volume: 0.8 });
                 this.scene.score += 2;
             }
         }
@@ -327,7 +293,16 @@ class Player extends Entity {
         }));
 
         this.addComponent("animator", new AnimatorComponent({ controller: PlayerAnimatorController() }));
-        this.addComponent("audio", new AudioSource());
+        this.addComponent("audio", new AudioSource({
+            clips: {
+                run: './assets/run.mp3',
+                jump: './assets/jump.mp3',
+                coin: './assets/coin.wav',
+                lose: './assets/lose.wav',
+                kill: './assets/enemykill.mp3',
+            },
+            volume: 1.0,
+        }));
         this.addComponent('script', new PlayerScript({
             speed: 200,
             playerCorpse: ref(300)
@@ -660,6 +635,7 @@ class Level extends Scene {
         this.frames = 0;
         this.lastTime = performance.now();
         this.score = 0;
+        this.gameover = false;
 
         const camera = new Camera(0, 0, this.game.config.width, this.game.config.height);
         this.addEntity(camera);
@@ -667,6 +643,7 @@ class Level extends Scene {
         const player = new Player(0, 0);
         this.addEntity(player);
         this.addEntity(new BackGround(0, 300));
+        this.PlayerScript = player.getComponent("script");
 
         this.spawn(PlayerCorpse, 800, 0);
 
@@ -708,8 +685,99 @@ class Level extends Scene {
         this.spawn(PlatformLong, 580, 180);
         this.spawn(PlatformShot, -300, 100);
 
+        this.scoreText = this.game.ui.add(new UIText({
+            text: "Score: 0",
+            anchor: "topLeft",
+            offset: { x: 2, y: 1 },
+            style: {
+                textColor: "rgba(255, 255, 255, 0.85)",
+                fontSize: 20,
+                fontFamily: "monospace",
+                fontWeight: "bold",
+            },
+        }));
+
+        this.FPSText = this.game.ui.add(new UIText({
+            text: `FPS: ${this.fps}`,
+            anchor: "topRight",
+            offset: { x: 1, y: 1 },
+            style: {
+                textColor: "rgba(255, 255, 255, 0.85)",
+                fontSize: 20,
+                fontFamily: "monospace",
+                fontWeight: "bold",
+            },
+        }));
+
+        this.panel = this.game.ui.add(new UIPanel({
+            anchor: "center",
+            offset: { x: 0, y: 0 },
+            width: 400,
+            height: 300,
+            zIndex: 0,
+            visible: false,
+
+            // per-element style overrides
+            style: {
+                surfaceColor: "#1a1a2e75",
+                borderColor: "#e63946",
+                borderWidth: 2,
+                borderRadius: 12,
+            },
+        }));
+
+        this.gameoverText = this.game.ui.add(new UIText({
+            text: `Game Over`,
+            anchor: "center",
+            offset: { x: 0, y: -50 },
+            visible: false,
+            style: {
+                textColor: "#ffffff",
+                fontSize: 40,
+                fontFamily: "monospace",
+                fontWeight: "bolder",
+            },
+        }));
+
+        this.bestscore = this.game.ui.add(new UIText({
+            text: `Best Score: ${this.score}`,
+            anchor: "center",
+            offset: { x: 0, y: 0 },
+            visible: false,
+            style: {
+                textColor: "#ffffff",
+                fontSize: 20,
+                fontFamily: "monospace",
+                fontWeight: "bolder",
+            },
+        }));
+
+        this.restarBtn = game.ui.add(new UIButton({
+            label: "Restart",
+            anchor: "center",
+            offset: { x: 0, y: 50 },
+            width: 160,
+            height: 48,
+            zIndex: 1,
+            visible: false,
+            style: {
+                primaryColor: "#e24a4a",
+                hoverColor: "#f25a5a",
+                pressColor: "#d23a3a",
+                fontSize: 16,
+                fontWeight: "bold",
+            },
+        }));
+
+        this.restarBtn.onClick = () => {
+            location.reload();
+        };
+
         // Camera follow
         camera.getComponent("camera").setTarget(player);
+
+        game.audio.playBGM('./assets/BG.mp3', { loop: true, fadeDuration: 1.5 });
+        game.audio.setBGMVolume(0.4);
     }
 
     render() {
@@ -729,19 +797,19 @@ class Level extends Scene {
             this.lastTime = now;
         }
 
-        // Renders the FPS counter and player score on the screen using the canvas
-        // context. The drawing state is preserved using save() and restore() to
-        // prevent side effects on other rendering operations.
-        this.ctx.save();
-        this.ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-        this.ctx.font = "20px monospace";
-        this.ctx.fillText(`FPS: ${this.fps}`, 715, 20);
+        this.scoreText.text = `Score: ${this.score}`;
+        this.FPSText.text = `FPS: ${this.fps}`;
 
-        this.ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-        this.ctx.font = "20px monospace";
-        this.ctx.fillText(`Score: ${this.score}`, 10, 20);
-
-        this.ctx.restore();
+        if (this.PlayerScript.isLose && !this.gameover) {
+            this.gameover = true;
+            this.bestscore.text = `Best Score: ${this.score}`;
+            this.gameoverText.visible = true;
+            this.bestscore.visible = true;
+            this.panel.visible = true;
+            this.FPSText.visible = false;
+            this.scoreText.visible = false;
+            this.restarBtn.visible = true;
+        }
     }
 }
 
@@ -764,6 +832,16 @@ const game = new MyGame({
     fps: 60,
     backgroundColor: "#eeeeee",
     // debugPhysics: true
+    container: "#canvas-container",
 });
+
+await game.audio.loadAll([
+    './assets/BG.mp3',
+    './assets/jump.mp3',
+    './assets/run.mp3',
+    './assets/coin.wav',
+    './assets/lose.wav',
+    './assets/enemykill.mp3'
+]);
 
 game.start();

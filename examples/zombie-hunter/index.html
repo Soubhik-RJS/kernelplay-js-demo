@@ -94,7 +94,7 @@
     {
       "imports": {
         "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.3.0/dist/kernelplay.es.js",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.3.3/dist/kernelplay.es.js",
         "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer@0.1.1/dist/pixi-renderer.es.js"
       }
     }
@@ -398,18 +398,16 @@
 // NOTES
 // -----------------------------------------------------------------------------
 //
-// 1. Audio System
-// This game includes a preliminary audio system implementation. It is currently
-// a test version and not part of the official release. The system functions
-// similarly to standard AudioListener and AudioSource components.
-// 
-// The audio system is available for use starting from version v0.3.0.
-// An official and fully supported implementation will be released in v0.3.1.
+// User Interface (UI)
+// The game includes a pre-release UI system starting from version v0.3.3.
+// It is available for use and intended for testing and early development.
+//
+// The official UI system will be released in version v0.4.0 and will introduce
+// a dedicated UI Canvas for rendering and managing user interface elements.
 //
 // -----------------------------------------------------------------------------
 
-
-import { Game, Scene, Entity, ScriptComponent, ref } from "kernelplay-js";
+import { Game, Scene, Entity, ScriptComponent, ref, UIText, UIProgressBar, UIPanel } from "kernelplay-js";
 import { PixiRenderer } from "@kernelplay/pixi-renderer";
 import { TransformComponent, CameraComponent, ColliderComponent, Rigidbody2DComponent } from "kernelplay-js";
 import { PixiSpriteComponent, PixiBoxRenderComponent } from "@kernelplay/pixi-renderer";
@@ -713,6 +711,7 @@ function ZombieAnimatorController() {
 export class PlayerScript extends ScriptComponent {
 
     health = 100;
+    maxHealth = 100;
 
     // --- LIFECYCLE ---
     onStart() {
@@ -726,10 +725,14 @@ export class PlayerScript extends ScriptComponent {
         this.isAttacking = false;
         this._isRunningSoundPlaying = false;
         this.fireCooldown = new Cooldown(1);
+        this.isLose = false;
+        this.score = 0;
     }
 
     update(dt) {
         // If we are currently swinging the sword, completely ignore all other logic
+        if (this.isLose) return;
+        this.scene.score.text = `Score: ${this.score}`;
         this.fireCooldown.update(dt);
 
         this.transform.position.x = Mathf.clamp(this.transform.position.x, -884, 884)
@@ -746,6 +749,7 @@ export class PlayerScript extends ScriptComponent {
         if (this.health <= 0) {
             this.getKill();
         }
+        this.scene.healthBar.setValue(this.health / this.maxHealth);
     }
 
 
@@ -767,40 +771,32 @@ export class PlayerScript extends ScriptComponent {
         }
 
         const isMoving = this.rb.velocity.x !== 0 || this.rb.velocity.y !== 0;
-
         if (isMoving) {
-            if (!this._isRunningSoundPlaying) {
-                this.runSound();
-                this._isRunningSoundPlaying = true;
-                console.log("running");
-            }
+            this.audio.playLoop('run', { volume: 0.5 });
         } else {
-            if (this._isRunningSoundPlaying) {
-                this.audio.stopAll();
-                this._isRunningSoundPlaying = false;
-            }
+            this.audio.stopLoop('run');
         }
+
+        // if (isMoving) {
+        //     if (!this._isRunningSoundPlaying) {
+        //         this.runSound();
+        //         this._isRunningSoundPlaying = true;
+        //         console.log("running");
+        //     }
+        // } else {
+        //     if (this._isRunningSoundPlaying) {
+        //         this.audio.stopAll();
+        //         this._isRunningSoundPlaying = false;
+        //     }
+        // }
 
         // Update animator parameters so it knows which idle/walk state to be in
         this.animator.setParameter("speedX", this.rb.velocity.x);
         this.animator.setParameter("speedY", this.rb.velocity.y);
     }
 
-    runSound() {
-        this.audio.playLoop('./assets/run_bit1.wav', {
-            volume: 0.5,
-        });
-    }
     hitSound() {
-        this.audio.playOneShot('./assets/damage.wav', {
-            volume: 0.5,
-            position: this.transform.position
-        })
-    }
-    attackSound() {
-        this.audio.playOneShot('./assets/attack.wav', {
-            volume: 0.5
-        });
+        this.audio.playOneShot('hurt', { volume: 1.0 });
     }
 
     // --- ATTACK ---
@@ -815,7 +811,8 @@ export class PlayerScript extends ScriptComponent {
 
         // 3. STRICT RULE: Only attack if button is pressed, we aren't already attacking, AND we are standing still!
         if (pressingAttack && !this.isAttacking && !isTryingToMove && this.fireCooldown.trigger()) {
-            this.attackSound();
+            // this.attackSound();
+            this.audio.playOneShot('attack', { volume: 1.0 });
             this.triggerAttack();
             this.Attack();
         }
@@ -834,13 +831,20 @@ export class PlayerScript extends ScriptComponent {
     }
 
     getKill() {
+        this.isLose = true;
+        this.scene.healthBar.setValue(0);
         this.instantiate(PlayerCorpse, this.transform.position.x, this.transform.position.y);
         this.audio.stopAll();
+        this.audio.playOneShot('lose', { volume: 1.0 });
+        this.game.audio.stopBGM(1.0);
         this.destroy();
     }
 
     getDamage() {
         this.health -= 25;
+        if (this.score - 25 > 0) {
+            this.score -= 25;
+        }
     }
 
     triggerAttack() {
@@ -870,7 +874,8 @@ export class PlayerScript extends ScriptComponent {
 
         if (other.name === "Trap") {
             // this.flashRedSmooth(this.sprite.object);
-            this.hitSound();
+            // this.hitSound();
+            this.audio.playOneShot('hurt', { volume: 1.0 });
             this.instantiate(PlayerHit, this.transform.position.x, this.transform.position.y);
             this.getKill();
         }
@@ -908,6 +913,7 @@ class EnemyScript extends ScriptComponent {
         this.rb = this.entity.getComponent("rigidbody2d");
         this.animator = this.entity.getComponent("animator");
         this.sprite = this.entity.getComponent("renderer");
+        this.audio = this.entity.getComponent("audio");
 
         this.currentSlowTimer = 0;
         this.currentAttackTimer = this.attackWindUp;
@@ -1050,6 +1056,11 @@ class EnemyScript extends ScriptComponent {
     }
 
     getKill() {
+        this.player.getComponent("script").score += 100;
+        if (this.player.getComponent("script").health < 100) {
+            this.player.getComponent("script").health += 10;
+        }
+        this.audio.playOneShot('killed', { volume: 1.0 });
         // 1. Reset Health (Assuming max health is 100)
         this.health = 100;
 
@@ -1098,7 +1109,14 @@ function Enemy(entity, x, y) {
     entity.addComponent("script", new EnemyScript({
         speed: 1000 * 5,
         player: ref(200)
-    }))
+    }));
+
+    entity.addComponent("audio", new AudioSource({
+        clips: {
+            killed: './assets/enemy-die.mp3',
+        },
+        volume: 1.0,
+    }));
 }
 
 // Define a Player entity that will be controlled by the user.
@@ -1127,6 +1145,13 @@ class Player extends Entity {
         this.addComponent("animator", new AnimatorComponent({ controller: PlayerAnimatorController() }));
 
         this.addComponent("audio", new AudioSource({
+            clips: {
+                run: './assets/run_bit1.wav',
+                hurt: './assets/damage.wav',
+                attack: './assets/attack.wav',
+                lose: './assets/lose.mp3',
+            },
+
             volume: 0.15
         }));
 
@@ -1276,6 +1301,7 @@ function PlayerCorpse(entity, x, y) {
 
 class Level extends Scene {
     init() {
+        this.gameover = false;
         const width = this.game.config.width;
         const height = this.game.config.height;
 
@@ -1285,10 +1311,11 @@ class Level extends Scene {
         camera.getComponent("camera").setTarget(player);
         camera.getComponent("camera").zoom = 1.5;
 
-        
+
         this.addEntity(camera);
         this.addEntity(player);
-        
+        this.playerScript = player.getComponent("script");
+
         this.addEntity(new BackGround(0, 0));
 
         const numberOfEnemies = 20;
@@ -1309,6 +1336,93 @@ class Level extends Scene {
         this.addEntity(new Blocker(598, -429, 5, 7));
         this.addEntity(new Trap(270, 253, 0.5, 0.5));
         this.addEntity(new Trap(-579, 13, 0.5, 0.5));
+
+        this.score = game.ui.add(new UIText({
+            text: "Score: 0",
+            anchor: "topLeft",
+            offset: { x: 20, y: 20 },
+            style: {
+                textColor: "#ffffff",
+                fontSize: 20,
+                fontWeight: "bold",
+            },
+        }));
+
+        this.healthBar = game.ui.add(new UIProgressBar({
+            value: 1.0,          // 1.0 = full
+            direction: "left",       // fills left → right
+            anchor: "topRight",
+            offset: { x: 20, y: 20 },
+            width: 200,
+            height: 20,
+            showText: false,
+            style: {
+                progressTrackColor: "#8e8e8e57",
+                progressFillColor: "#0bdc00",   // red health bar
+                borderRadius: 0,
+            },
+        }));
+
+        this.panel = game.ui.add(new UIPanel({
+            anchor: "center",
+            offset: { x: 0, y: 0 },
+            width: 400,
+            height: 300,
+            zIndex: 0,
+            visible: false,
+
+            // per-element style overrides
+            style: {
+                surfaceColor: "#1a1a2e79",
+                borderColor: "#e63946",
+                borderWidth: 2,
+                borderRadius: 12,
+            },
+        }));
+
+        this.GameOver = game.ui.add(new UIText({
+            text: "Game Over",
+            anchor: "center",
+            offset: { x: 0, y: -50 },
+            visible: false,
+            style: {
+                textColor: "#ffffff",
+                fontSize: 40,
+                fontWeight: "bolder",
+            },
+        }));
+
+        this.BestScore = game.ui.add(new UIText({
+            text: `Best Score: ${this.playerScript.score}
+            Press 'R' to restart`,
+            anchor: "center",
+            offset: { x: 0, y: 100 },
+            visible: false,
+            style: {
+                textColor: "#ffffff",
+                fontSize: 20,
+                fontWeight: "bold",
+            },
+        }));
+
+        game.audio.playBGM('./assets/bg-8bit.mp3', { loop: true });
+        game.audio.setBGMVolume(0.15);
+    }
+
+    update(dt) {
+        super.update(dt);
+        if(this.playerScript.isLose && !this.gameover){
+            this.gameover = true;
+            this.panel.visible = true;
+            this.GameOver.visible = true;
+            this.BestScore.visible = true;
+            this.BestScore.text = `Best Score: ${this.playerScript.score}  Press 'R' to restart`;
+            console.log('game over');
+        }
+        if(Keyboard.isPressed(KeyCode.R) && this.gameover){
+            // this.game.sceneManager.startScene("Level");
+            location.reload();
+        }
     }
 }
 
@@ -1326,6 +1440,7 @@ const game = new MyGame({
     height: 600,
     fps: 60,
     // debugPhysics: true,
+    container: "#canvas-container"
 });
 
 // Preload all assets BEFORE starting
@@ -1335,6 +1450,15 @@ await PIXI.Assets.load([
     "./assets/player_hit_sheet.png",
     "./assets/zombie_hit_sheet.png",
     "./assets/background.png",
+]);
+
+await game.audio.loadAll([
+    './assets/run_bit1.wav',
+    './assets/damage.wav',
+    './assets/attack.wav',
+    './assets/lose.mp3',
+    './assets/enemy-die.mp3',
+    './assets/bg-8bit.mp3'
 ]);
 
 game.start();
@@ -1360,7 +1484,7 @@ game.start();
     {
       "imports": {
         "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.3.0/dist/kernelplay.es.js",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.3.3/dist/kernelplay.es.js",
         "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer@0.1.1/dist/pixi-renderer.es.js"
       }
     }
@@ -1427,7 +1551,7 @@ game.start();
   <script src="../../examples.js"></script>
   <script type="module" src="../../demo_games/zombie_hunter.js"></script>
 
-  <script>
+  <!-- <script>
     window.addEventListener('load', async () => {
       setTimeout(() => {
         const container1 = document.getElementById('canvas-container');
@@ -1435,7 +1559,7 @@ game.start();
         container1.appendChild(canvas);
       }, 100);
     })
-  </script>
+  </script> -->
 </body>
 
 </html>

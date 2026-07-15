@@ -220,38 +220,70 @@ if (clearConsoleBtn) {
 // Canvas container responsive handling
 const container = document.getElementById('canvas-container');
 
-function adjustCanvasContainer() {
-  const canvas = container.querySelector('canvas');
-  if (canvas) {
-    canvas.style.display = 'block';
-    canvas.style.maxWidth = '100%';
-    canvas.style.height = 'auto';
+// function adjustCanvasContainer() {
+//   const canvas = container.querySelector('canvas');
+//   if (canvas) {
+//     canvas.style.display = 'block';
+//     canvas.style.maxWidth = '100%';
+//     canvas.style.height = 'auto';
     
-    const containerRect = container.parentElement.getBoundingClientRect();
-    const availableWidth = containerRect.width - 32;
-    const availableHeight = containerRect.height - 32;
+//     const containerRect = container.parentElement.getBoundingClientRect();
+//     const availableWidth = containerRect.width - 32;
+//     const availableHeight = containerRect.height - 32;
     
-    const canvasWidth = 800;
-    const canvasHeight = 600;
+//     const canvasWidth = 800;
+//     const canvasHeight = 600;
     
-    const scaleX = availableWidth / canvasWidth;
-    const scaleY = availableHeight / canvasHeight;
-    const scale = Math.min(scaleX, scaleY, 1);
+//     const scaleX = availableWidth / canvasWidth;
+//     const scaleY = availableHeight / canvasHeight;
+//     const scale = Math.min(scaleX, scaleY, 1);
     
-    if (scale < 1) {
-      canvas.style.width = `${canvasWidth * scale}px`;
-      canvas.style.height = `${canvasHeight * scale}px`;
-    } else {
-      canvas.style.width = `${canvasWidth}px`;
-      canvas.style.height = `${canvasHeight}px`;
-    }
+//     if (scale < 1) {
+//       canvas.style.width = `${canvasWidth * scale}px`;
+//       canvas.style.height = `${canvasHeight * scale}px`;
+//     } else {
+//       canvas.style.width = `${canvasWidth}px`;
+//       canvas.style.height = `${canvasHeight}px`;
+//     }
     
-    container.style.width = canvas.style.width;
-    container.style.height = canvas.style.height;
-  }
-}
+//     container.style.width = canvas.style.width;
+//     container.style.height = canvas.style.height;
+//   }
+// }
 
 // Observe canvas addition
+
+function adjustCanvasContainer() {
+  const canvases = container.querySelectorAll('canvas');
+  if (!canvases.length || !container.parentElement) return;
+
+  const containerRect = container.parentElement.getBoundingClientRect();
+  const availableWidth = containerRect.width - 32;
+  const availableHeight = containerRect.height - 32;
+
+  // Use the main canvas dimensions
+  const canvasWidth = canvases[0].width || 800;
+  const canvasHeight = canvases[0].height || 600;
+
+  const scale = Math.min(
+    availableWidth / canvasWidth,
+    availableHeight / canvasHeight,
+    1
+  );
+
+  const width = canvasWidth * scale;
+  const height = canvasHeight * scale;
+
+  canvases.forEach(canvas => {
+    canvas.style.display = 'block';
+    canvas.style.maxWidth = '100%';
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+  });
+
+  container.style.width = `${width}px`;
+  container.style.height = `${height}px`;
+}
 const observer = new MutationObserver((mutations) => {
   for (let mutation of mutations) {
     if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
