@@ -384,7 +384,12 @@ scene.addEntity(player);</code></pre>
 
     // Jump — only when on ground
     if (Keyboard.wasPressed("Space") && this.isGrounded) {
-      rb.velocity.y = -420;
+      rb.addForce(0, -600, "impulse");  //modes force and impulse
+    }
+
+    // Use rigidbodies default ground checking systems
+    if(this.rb.isGrounded){
+      // your code
     }
   }
 

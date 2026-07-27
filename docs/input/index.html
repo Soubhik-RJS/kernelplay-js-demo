@@ -341,21 +341,21 @@
               Copy
             </button>
           </div>
-          <pre><code id="keyboard-code" class="language-js">import { Keyboard } from "kernelplay-js";
+          <pre><code id="keyboard-code" class="language-js">import { Keyboard, KeyCode } from "kernelplay-js";
 
 // Held down this frame
-if (Keyboard.isPressed("ArrowRight")) { rb.velocity.x = 200; }
+if (Keyboard.isPressed(KeyCode.ArrowRight)) { rb.velocity.x = 200; }
 
 // Pressed exactly this frame (good for jumps/actions)
-if (Keyboard.wasPressed("Space")) { rb.velocity.y = -400; }
+if (Keyboard.wasPressed(KeyCode.Space)) { rb.velocity.y = -400; }
 
 // Released this frame
-if (Keyboard.wasReleased("Escape")) { pauseGame(); }
+if (Keyboard.wasReleased(KeyCode.Escape)) { pauseGame(); }
 
-// Common key strings:
-// Arrow keys:  "ArrowUp" "ArrowDown" "ArrowLeft" "ArrowRight"
-// WASD:        "w" "a" "s" "d" (lowercase)
-// Misc:        "Space" "Enter" "Escape" "ShiftLeft" "ShiftRight"
+// Common key Code:
+// Arrow keys:  ArrowUp, ArrowDown, ArrowLeft, ArrowRight
+// WASD:        W, A, S, D
+// Misc:        Space, Enter, Escape, ShiftLeft, ShiftRight
 // Any key:     Use the KeyboardEvent.key value directly</code></pre>
         </div>
 
@@ -373,16 +373,16 @@ if (Keyboard.wasReleased("Escape")) { pauseGame(); }
               Copy
             </button>
           </div>
-          <pre><code id="mouse-code" class="language-js">import { Mouse } from "kernelplay-js";
+          <pre><code id="mouse-code" class="language-js">import { Mouse, MouseButton } from "kernelplay-js";
 
 // Position (canvas-relative)
 const x = Mouse.x;
 const y = Mouse.y;
 
 // Buttons: 0 = left, 1 = middle, 2 = right
-if (Mouse.isPressed(0))    { /* holding left button */ }
-if (Mouse.wasPressed(0))   { /* clicked this frame */ }
-if (Mouse.wasReleased(2))  { /* right button released */ }
+if (Mouse.isPressed(MouseButton.Left))    { /* holding left button */ }
+if (Mouse.wasPressed(MouseButton.Left))   { /* clicked this frame */ }
+if (Mouse.wasReleased(MouseButton.Right))  { /* right button released */ }
 
 // Delta movement since last frame
 const dx = Mouse.deltaX;
