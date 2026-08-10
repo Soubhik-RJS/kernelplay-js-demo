@@ -93,7 +93,7 @@
   <script type="importmap">
     {
       "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.2.0/dist/kernelplay.es.js"
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.2.3/dist/kernelplay.es.js"
       }
     }
   </script>
@@ -185,7 +185,7 @@
             </a>
 
             <a href="./parallax-game/"
-              class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
+              class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z"/>
@@ -262,7 +262,7 @@
               <span class="font-medium">Performance</span>
             </button> -->
             <a href="../BenchmarkCanvas2D/"
-              class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
+              class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
@@ -357,119 +357,17 @@
               </button>
 
               <div id="settings-dropdown"
-                class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl border border-indigo-200 z-50 max-h-[80vh] overflow-y-auto">
-                <div class="p-4">
-                  <!-- Header -->
-                  <div class="mb-4 pb-3 border-b border-indigo-200">
-                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                      </svg>
-                      Benchmark Settings
-                    </h4>
-                  </div>
-
-                  <!-- Object Count -->
-                  <div class="mb-4">
-                    <label class="flex items-center justify-between text-xs font-semibold text-gray-700 mb-2">
-                      <span>Object Count</span>
-                      <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs font-mono"
-                        id="objectCountValue">5000</span>
-                    </label>
-                    <input type="range" id="objectCount" min="100" max="20000" value="5000" step="100"
-                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-                    <div class="text-xs text-gray-500 mt-1">
-                      Total number of objects in the scene
-                    </div>
-                  </div>
-
-                  <!-- Physics Percentage -->
-                  <div class="mb-4">
-                    <label class="flex items-center justify-between text-xs font-semibold text-gray-700 mb-2">
-                      <span>Physics Objects</span>
-                      <span class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-mono"
-                        id="physicsPercentageValue">10%</span>
-                    </label>
-                    <input type="range" id="physicsPercentage" min="0" max="100" value="10" step="5"
-                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-                    <div class="text-xs text-gray-500 mt-1">
-                      Percentage of objects with physics enabled
-                    </div>
-                  </div>
-
-                  <!-- Density / World Size -->
-                  <div class="mb-4">
-                    <label class="flex items-center justify-between text-xs font-semibold text-gray-700 mb-2">
-                      <span>World Size</span>
-                      <span class="px-2 py-0.5 bg-pink-100 text-pink-700 rounded text-xs font-mono"
-                        id="densityValue">5000</span>
-                    </label>
-                    <input type="range" id="density" min="1000" max="10000" value="5000" step="500"
-                      class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider">
-                    <div class="text-xs text-gray-500 mt-1">
-                      Spread area (higher = more spread out, fewer visible)
-                    </div>
-                  </div>
-
-                  <!-- Apply Button -->
-                  <button id="applyButton"
-                    class="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-sm hover:shadow-lg flex items-center justify-center gap-2 mb-4">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Apply Changes
-                  </button>
-
-                  <!-- Quick Presets -->
-                  <div class="pt-3 border-t border-indigo-200">
-                    <label class="text-xs font-semibold text-gray-700 mb-3 block">Quick Presets</label>
-                    <div class="grid grid-cols-2 gap-2">
-                      <button
-                        class="preset-btn px-3 py-3 rounded-lg bg-white border-2 border-gray-200 hover:border-green-400 text-center text-xs font-medium hover:shadow-md"
-                        data-preset="light">
-                        <div class="text-lg mb-1">🟢</div>
-                        <div class="font-semibold text-gray-800">Light</div>
-                        <div class="text-gray-500 text-xs">1K objects</div>
-                      </button>
-                      <button
-                        class="preset-btn px-3 py-3 rounded-lg bg-white border-2 border-gray-200 hover:border-yellow-400 text-center text-xs font-medium hover:shadow-md"
-                        data-preset="medium">
-                        <div class="text-lg mb-1">🟡</div>
-                        <div class="font-semibold text-gray-800">Medium</div>
-                        <div class="text-gray-500 text-xs">5K objects</div>
-                      </button>
-                      <button
-                        class="preset-btn px-3 py-3 rounded-lg bg-white border-2 border-gray-200 hover:border-orange-400 text-center text-xs font-medium hover:shadow-md"
-                        data-preset="heavy">
-                        <div class="text-lg mb-1">🟠</div>
-                        <div class="font-semibold text-gray-800">Heavy</div>
-                        <div class="text-gray-500 text-xs">10K objects</div>
-                      </button>
-                      <button
-                        class="preset-btn px-3 py-3 rounded-lg bg-white border-2 border-gray-200 hover:border-red-400 text-center text-xs font-medium hover:shadow-md"
-                        data-preset="extreme">
-                        <div class="text-lg mb-1">🔴</div>
-                        <div class="font-semibold text-gray-800">Extreme</div>
-                        <div class="text-gray-500 text-xs">20K objects</div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Divider -->
-                  <div class="my-3 border-t border-indigo-200"></div>
-
-                  <!-- Other Options -->
+                class="hidden absolute right-0 mt-2 w-56 glass-effect rounded-lg shadow-xl border border-indigo-200 z-50">
+                <div class="py-2">
                   <button onclick="window.location.reload();"
-                    class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 rounded-lg flex items-center gap-2">
+                    class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Reset Demo
                   </button>
-                  <a href="../../fullscreen/BenchmarkCanvas2D/"
+                  <a href="../../fullscreen/Canvas2D/"
                     class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -477,6 +375,19 @@
                     </svg>
                     Full Screen
                   </a>
+                  <!-- <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Export Code
+                  </button>
+                  <div class="border-t border-gray-200 my-2"></div>
+                  <button class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Help
+                  </button> -->
                 </div>
               </div>
             </div>
@@ -518,7 +429,17 @@
               main.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="scene">
-              scenes/BenchmarkScene.js
+              scenes/Level1.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="player">
+              prefabs/Player.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="box">
+              prefabs/Box.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap"
+              data-file="playercontroller">
+              script/PlayerController.js
             </button>
 
           </div>
@@ -534,23 +455,22 @@
                 </button>
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
-import { BenchmarkScene } from "./scenes/BenchmarkScene.js";
+import { Level1 } from "./scenes/Level1.js";
 
 class MyGame extends Game {
   init() {
-    this.sceneManager.addScene(new BenchmarkScene("BenchmarkScene"));
-    this.sceneManager.startScene("BenchmarkScene");
+    this.sceneManager.addScene(new Level1("Level1"));
+    this.sceneManager.startScene("Level1");
   }
 }
 
 const game = new MyGame({
   width: 800,
   height: 600,
-  fps: 90
+  fps: 60
 });
 
-game.start();
-</code></pre>
+game.start();</code></pre>
             </div>
 
             <div class="code-file active" data-file="index">
@@ -582,258 +502,197 @@ game.start();
 
             <div class="code-file hidden" data-file="scene">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">BenchmarkScene.js</span>
+                <span class="text-xs text-gray-400">Level1.js</span>
                 <button onclick="copyCodeFile(event, 'scene-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene, Entity, Keyboard } from "kernelplay-js";
-import { BoxRenderComponent, ColliderComponent } from "kernelplay-js";
-import { TransformComponent } from "kernelplay-js";
-import { Rigidbody2DComponent } from "kernelplay-js";
+              <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene } from "kernelplay-js";
+import { Player } from "../prefabs/Player.js";
+import { Box } from "../prefabs/Box.js";
+import { Entity, TransformComponent, CameraComponent } from "kernelplay-js";
 
-export class BenchmarkScene extends Scene {
-    init() {
-        this.ctx = this.game.renderer.ctx;
+export class Level1 extends Scene {
+  init() {
+    const player = new Player(400, 100);
 
-        // 🔥 FPS tracking
-        this.fps = 0;
-        this.frames = 0;
-        this.lastTime = performance.now();
+    const camera = new Entity("MainCamera");
+    camera.id = 100;
+    camera.addComponent("transform", new TransformComponent({
+      position: { x: 400, y: 300, z: 10 }
+    }));
+    camera.addComponent("camera", new CameraComponent({
+      width: 800,
+      height: 600,
+      isPrimary: true,
+      target: player,
+    }));
 
-        // 🔥 Frame time tracking
-        this.frameTime = 0;
-        this.avgFrameTime = 0;
-        this.frameTimeSamples = [];
-        this.maxSamples = 60;
+    this.addEntity(camera);
+    this.addEntity(player);
 
-        // 🔥 GC detection
-        this.lastFrameTime = 0;
-        this.gcSpikes = 0;
-        this.gcSpikeThreshold = 16.67 * 3; // 3x normal frame time (50ms)
+    this.addEntity(new Box(400, 300, "Wall"));
+    this.addEntity(new Box(650, 370, "Wall"));
+    this.addEntity(new Box(650, 170, "Wall"));
+    this.addEntity(new Box(150, 170, "Wall"));
+    this.addEntity(new Box(150, 360, "Wall"));
 
-        // 🔥 CPU usage estimation
-        this.cpuUsage = 0;
+    this.addEntity(new Box(650, 120, "Coin"));
+    this.addEntity(new Box(150, 315, "Coin"));
+  }
+}</code></pre>
+            </div>
 
-        // 🔥 Stats
-        this.entityCount = 5000;
-        this.visibleCount = 0;
+            <div class="code-file hidden" data-file="player">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">Player.js</span>
+                <button onclick="copyCodeFile(event, 'player-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="player-code" class="language-javascript">import {
+    Entity,
+    TransformComponent,
+    ColliderComponent,
+    BoxRenderComponent,
+    Rigidbody2DComponent
+} from "kernelplay-js";
 
-        // 🔥 Settings from HTML controls (will be updated)
-        this.settings = {
-            objectCount: 5000,
-            physicsPercentage: 10,
-            density: 5000 // spread area
-        };
+import { PlayerController } from "../scripts/PlayerController.js";
+import { Layers } from "kernelplay-js";
 
-        // 🔥 Create initial entities
-        this.rebuildScene();
+export class Player extends Entity {
+    constructor(x, y) {
+        super("Player");
 
-        // 🔥 Listen for settings changes
-        this.setupSettingsListener();
+        this.layer = Layers.Player;
+        this.tag = "player"
+
+        this.addComponent("transform", new TransformComponent({
+            position: { x, y },
+        }));
+        this.addComponent("rigidbody2d",new Rigidbody2DComponent({
+            mass: 1,
+            gravityScale: 1
+        }));
+        this.addComponent("collider", new ColliderComponent());
+        this.addComponent("renderer", new BoxRenderComponent("red"));
+        this.addComponent("playerController", new PlayerController());
     }
+}</code></pre>
+            </div>
 
-    setupSettingsListener() {
-        // Check for settings updates from HTML UI
-        window.benchmarkSettings = this.settings;
+            <div class="code-file hidden" data-file="box">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">Box.js</span>
+                <button onclick="copyCodeFile(event, 'box-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="box-code" class="language-javascript">import {
+    Entity,
+    TransformComponent,
+    ColliderComponent,
+    BoxRenderComponent,
+} from "kernelplay-js";
+
+export class Box extends Entity {
+    constructor(x, y, name="Wall") {
+
+        super(name);
+        this.tag = name.toLowerCase();
+        this.zIndex = -1;
         
-        window.updateBenchmarkSettings = (newSettings) => {
-            this.settings = { ...this.settings, ...newSettings };
-            this.rebuildScene();
-        };
-    }
-
-    rebuildScene() {
-        console.log(`🔥 Creating ${this.settings.objectCount} entities...`);
-        const startTime = performance.now();
-
-        // Clear existing entities
-        for (const entity of this.entities) {
-            entity.destroy();
-        }
-        this.entities = [];
-        this._rigidbody2D = [];
-        this._colliders = [];
-        this._renderers = [];
-
-        this.createEntities(this.settings.objectCount);
-
-        const endTime = performance.now();
-        console.log(`✅ Created in ${(endTime - startTime).toFixed(2)}ms`);
-    }
-
-    createEntities(count) {
-        const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
-        const physicsChance = this.settings.physicsPercentage / 100;
-        const spread = this.settings.density;
-
-        for (let i = 0; i < count; i++) {
-            const entity = new Entity(`Box_${i}`);
-
-            // Random position based on density
-            const x = Math.random() * spread - spread / 2;
-            const y = Math.random() * spread - spread / 2;
-
-            entity.addComponent("transform", new TransformComponent({
-                position: { x, y, z: 0 }
-            }));
-
-            const color = colors[Math.floor(Math.random() * colors.length)];
-
-            entity.addComponent("renderer", new BoxRenderComponent({
-                color,
-                zIndex: Math.floor(Math.random() * 10)
-            }));
-
-            // Physics based on percentage
-            if (Math.random() < physicsChance) {
-                entity.addComponent("collider", new ColliderComponent({
-                    width: 50,
-                    height: 50
+        switch (name) {
+            case "Wall":
+                this.addComponent("transform", new TransformComponent({
+                    position: { x, y },
+                    scale: {x: 3, y: 1}
                 }));
-
-                entity.addComponent("rigidbody2d", new Rigidbody2DComponent({
-                    mass: 1,
-                    gravityScale: 0,
-                    drag: 0.1
+                this.addComponent("collider", new ColliderComponent({isTrigger:false}));
+                this.addComponent("renderer", new BoxRenderComponent({color:"#135800"}));
+                break;
+        
+            case "Coin":
+                this.addComponent("transform", new TransformComponent({
+                    position: { x, y },
+                    scale: {x: 0.4, y: 0.4}
                 }));
-
-                const rb = entity.getComponent("rigidbody2d");
-                rb.velocity.x = (Math.random() - 0.5) * 200;
-                rb.velocity.y = (Math.random() - 0.5) * 200;
-            }
-
-            this.addEntity(entity);
+                this.addComponent("collider", new ColliderComponent({isTrigger:true}));
+                this.addComponent("renderer", new BoxRenderComponent({color:"#ffea00"}));
+                break;
         }
+    }
+}
+</code></pre>
+            </div>
+
+            <div class="code-file hidden" data-file="playercontroller">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">PlayerController.js</span>
+                <button onclick="copyCodeFile(event, 'script-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse, Layers } from "kernelplay-js";
+
+export class PlayerController extends ScriptComponent {
+    onStart(){
+        this.pos = this.entity.getComponent("transform").position;
     }
 
     update(dt) {
-        const updateStart = performance.now();
+        const rb = this.entity.getComponent("rigidbody2d");
 
-        super.update(dt);
+        rb.velocity.x = 0;
+        // rb.velocity.y = 0;
 
-        // 🔥 Frame time calculation
-        const updateEnd = performance.now();
-        this.frameTime = updateEnd - updateStart;
+        if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200;
+        if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200;
+        if (Keyboard.isPressed("ArrowUp")) rb.velocity.y = -200;
+        if (Keyboard.isPressed("ArrowDown")) rb.velocity.y = 200;
 
-        // 🔥 Average frame time
-        this.frameTimeSamples.push(this.frameTime);
-        if (this.frameTimeSamples.length > this.maxSamples) {
-            this.frameTimeSamples.shift();
+        if (Mouse.wasPressed(0)) {
+            const hit = this.entity.scene.raycast(Mouse.x, Mouse.y, {
+                layerMask: Layers.Player
+            });
+
+            console.log("Hit (Player layer only):", hit?.entity?.tag);
         }
-        this.avgFrameTime = this.frameTimeSamples.reduce((a, b) => a + b, 0) / this.frameTimeSamples.length;
 
-        // 🔥 GC spike detection
-        if (this.lastFrameTime > 0 && this.frameTime > this.gcSpikeThreshold) {
-            this.gcSpikes++;
-        }
-        this.lastFrameTime = this.frameTime;
-
-        // 🔥 CPU usage estimation (frame time / target frame time)
-        this.cpuUsage = Math.min(100, (this.frameTime / 16.67) * 100);
-
-        // 🔥 FPS calculation
-        this.frames++;
-        const now = performance.now();
-
-        if (now >= this.lastTime + 1000) {
-            this.fps = Math.round((this.frames * 1000) / (now - this.lastTime));
-            this.frames = 0;
-            this.lastTime = now;
-            
-            // Reset GC spike counter every second
-            if (this.gcSpikes > 0) {
-                console.log(`⚠️ ${this.gcSpikes} GC spikes detected in last second`);
+        if (rb.isGrounded) {
+            if (Keyboard.isPressed(" ")) {
+                rb.addForce(0, -600, "impulse");
+                this.isGround = false;
             }
-            this.gcSpikes = 0;
         }
 
-        // 🔥 Camera controls
-        const speed = 500;
-        if (Keyboard.isPressed("ArrowLeft")) this.game.camera.x -= speed * dt;
-        if (Keyboard.isPressed("ArrowRight")) this.game.camera.x += speed * dt;
-        if (Keyboard.isPressed("ArrowUp")) this.game.camera.y -= speed * dt;
-        if (Keyboard.isPressed("ArrowDown")) this.game.camera.y += speed * dt;
-
-        // 🔥 Update visible count
-        this.visibleCount = this._visibleCount || 0;
-
-        // Exit benchmark
-        if (Keyboard.isPressed("Escape")) {
-            this.game.sceneManager.startScene("Menu");
+        if(this.pos.x > 1000, this.pos.y > 1000) {
+            this.pos.x = 400;
+            this.pos.y = 100;
         }
     }
 
-    render() {
-        const { width, height } = this.game.config;
+    // onCollision(other) {
+    //     // Called when a solid collision occurs
+    //     console.log("Player hit:", other.name);
+    // }
 
-        // 🔥 Render via parent (uses optimized renderer)
-        super.render(this.game.renderer);
-
-        // 🔥 Draw enhanced stats overlay
-        this.ctx.save();
-        
-        // Background panel
-        this.ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
-        this.ctx.fillRect(10, 10, 320, 260);
-
-        // Title
-        this.ctx.fillStyle = "#00FFFF";
-        this.ctx.font = "bold 18px monospace";
-        this.ctx.fillText("PERFORMANCE METRICS", 20, 35);
-
-        // FPS (color coded)
-        this.ctx.font = "16px monospace";
-        if (this.fps >= 55) {
-            this.ctx.fillStyle = "#00FF00"; // Green
-        } else if (this.fps >= 30) {
-            this.ctx.fillStyle = "#FFFF00"; // Yellow
-        } else {
-            this.ctx.fillStyle = "#FF0000"; // Red
+    onTriggerEnter(other) {
+        // Called when entering a trigger collider
+        // console.log("Player entered trigger:", other.tag);
+        if (other.tag === "coin") {
+            other.destroy();
+            console.log("Coin collected !!!");
+            
         }
-        this.ctx.fillText(`FPS: ${this.fps}`, 20, 65);
-
-        // Frame time
-        this.ctx.fillStyle = "#FFFFFF";
-        this.ctx.fillText(`Frame Time: ${this.frameTime.toFixed(2)}ms`, 20, 90);
-        this.ctx.fillText(`Avg Frame: ${this.avgFrameTime.toFixed(2)}ms`, 20, 110);
-
-        // CPU usage
-        const cpuColor = this.cpuUsage > 90 ? "#FF0000" : 
-                        this.cpuUsage > 70 ? "#FFFF00" : "#00FF00";
-        this.ctx.fillStyle = cpuColor;
-        this.ctx.fillText(`CPU Usage: ${this.cpuUsage.toFixed(1)}%`, 20, 130);
-
-        // GC spikes
-        this.ctx.fillStyle = this.gcSpikes > 0 ? "#FF0000" : "#00FF00";
-        this.ctx.fillText(`GC Spikes: ${this.gcSpikes}/sec`, 20, 150);
-
-        // Entity stats
-        this.ctx.fillStyle = "#FFFFFF";
-        this.ctx.fillText(`Total Entities: ${this.entities.length}`, 20, 175);
-        this.ctx.fillText(`Visible: ${this.visibleCount}`, 20, 195);
-        this.ctx.fillText(`Physics: ${this._rigidbody2D.length}`, 20, 215);
-        
-        // Camera position
-        this.ctx.fillStyle = "#888888";
-        this.ctx.font = "12px monospace";
-        this.ctx.fillText(
-            `Cam: (${Math.round(this.game.camera.x)}, ${Math.round(this.game.camera.y)})`, 
-            20, 
-            240
-        );
-
-        // Controls
-        this.ctx.fillStyle = "#000000";
-        this.ctx.font = "14px monospace";
-        this.ctx.fillText("Arrow Keys: Move Camera", 20, height - 60);
-        this.ctx.fillText("Use HTML Controls to adjust →", 20, height - 40);
-        this.ctx.fillText("ESC: Exit Benchmark", 20, height - 20);
-
-        this.ctx.restore();
     }
-}</code></pre>
+}
+</code></pre>
             </div>
 
           </div>
@@ -891,81 +750,7 @@ export class BenchmarkScene extends Scene {
   </div>
 
   <script src="../../examples.js"></script>
-  
-
-  <script type="module">
-        // Update value displays
-        const objectCountSlider = document.getElementById('objectCount');
-        const physicsSlider = document.getElementById('physicsPercentage');
-        const densitySlider = document.getElementById('density');
-
-        const objectCountValue = document.getElementById('objectCountValue');
-        const physicsValue = document.getElementById('physicsPercentageValue');
-        const densityValue = document.getElementById('densityValue');
-        const currentStats = document.getElementById('currentStats');
-
-        function updateDisplays() {
-            objectCountValue.textContent = objectCountSlider.value;
-            physicsValue.textContent = physicsSlider.value + '%';
-            densityValue.textContent = densitySlider.value;
-
-            const physicsCount = Math.round(
-                (objectCountSlider.value * physicsSlider.value) / 100
-            );
-            // currentStats.textContent =
-            //     `${objectCountSlider.value} objects, ${physicsCount} with physics`;
-        }
-
-        objectCountSlider.addEventListener('input', updateDisplays);
-        physicsSlider.addEventListener('input', updateDisplays);
-        densitySlider.addEventListener('input', updateDisplays);
-
-        // Apply button
-        document.getElementById('applyButton').addEventListener('click', () => {
-            if (window.updateBenchmarkSettings) {
-                window.updateBenchmarkSettings({
-                    objectCount: parseInt(objectCountSlider.value),
-                    physicsPercentage: parseInt(physicsSlider.value),
-                    density: parseInt(densitySlider.value)
-                });
-            }
-        });
-
-        // Preset buttons
-        const presets = {
-            light: { objectCount: 1000, physicsPercentage: 10, density: 3000 },
-            medium: { objectCount: 5000, physicsPercentage: 10, density: 5000 },
-            heavy: { objectCount: 10000, physicsPercentage: 10, density: 7000 },
-            extreme: { objectCount: 20000, physicsPercentage: 5, density: 10000 }
-        };
-
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const preset = presets[btn.dataset.preset];
-                objectCountSlider.value = preset.objectCount;
-                physicsSlider.value = preset.physicsPercentage;
-                densitySlider.value = preset.density;
-                updateDisplays();
-
-                // Auto-apply
-                if (window.updateBenchmarkSettings) {
-                    window.updateBenchmarkSettings(preset);
-                }
-            });
-        });
-
-        updateDisplays();
-
-        window.addEventListener('load', async () => {
-            setTimeout(() => {
-                const container1 = document.getElementById('canvasWrapper');
-                const canvas = document.getElementsByTagName('canvas')[0];
-                container1.appendChild(canvas);
-            }, 100);
-        })
-    </script>
-
-    <script type="module" src="../../Benchmark.js"></script>
+  <script type="module" src="../../main.js"></script>
 
   <script>
     window.addEventListener('load', async () => {
