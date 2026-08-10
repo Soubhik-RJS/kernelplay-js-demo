@@ -93,7 +93,9 @@
   <script type="importmap">
     {
       "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.2.3/dist/kernelplay.es.js"
+        "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@8.0.0/dist/pixi.min.mjs",
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@latest/dist/kernelplay.es.js",
+        "@kernelplay/pixi-renderer": "https://cdn.jsdelivr.net/npm/@kernelplay/pixi-renderer/dist/pixi-renderer.es.js"
       }
     }
   </script>
@@ -170,7 +172,7 @@
               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z"/>
+                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z" />
               </svg>
               <span class="font-medium">Parkour Boy</span>
             </a>
@@ -179,7 +181,7 @@
               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-white hover:bg-indigo-50 text-gray-700 border border-gray-200 text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z"/>
+                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z" />
               </svg>
               <span class="font-medium">Zombie Hunter</span>
             </a>
@@ -188,7 +190,7 @@
               class="flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg text-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z"/>
+                  d="M6 12h4m-2-2v4m6-1h.01M17 11h.01M7 17h10a4 4 0 004-4v-1a6 6 0 00-6-6H9a6 6 0 00-6 6v1a4 4 0 004 4z" />
               </svg>
               <span class="font-medium">Parallax Game</span>
             </a>
@@ -336,8 +338,10 @@
       <header class="z-10 glass-effect border-b border-indigo-200 px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">Canvas 2D Renderer</h2>
-            <p class="text-sm text-gray-600">High-performance 2D graphics rendering</p>
+            <h2 class="text-xl font-bold text-gray-800">Parallax Game</h2>
+            <p class="text-sm text-gray-600">
+              Immersive 2D gameplay with smooth parallax scrolling and dynamic depth.
+            </p>
           </div>
           <div class="flex items-center gap-3">
             <div
@@ -750,7 +754,7 @@ export class PlayerController extends ScriptComponent {
   </div>
 
   <script src="../../examples.js"></script>
-  <script type="module" src="../../main.js"></script>
+  <script type="module" src="../../demo_games/parallax-game.js"></script>
 
   <script>
     window.addEventListener('load', async () => {

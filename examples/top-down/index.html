@@ -93,7 +93,7 @@
   <script type="importmap">
     {
       "imports": {
-        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.2.3/dist/kernelplay.es.js"
+        "kernelplay-js": "https://cdn.jsdelivr.net/npm/kernelplay-js@0.4.0/dist/kernelplay.es.js"
       }
     }
   </script>
@@ -336,9 +336,11 @@
       <header class="z-10 glass-effect border-b border-indigo-200 px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold text-gray-800">Canvas 2D Renderer</h2>
-            <p class="text-sm text-gray-600">High-performance 2D graphics rendering</p>
-          </div>
+  <h2 class="text-xl font-bold text-gray-800">Top-Down Game</h2>
+  <p class="text-sm text-gray-600">
+    Smooth 2D gameplay with dynamic maps, responsive movement, and fast rendering.
+  </p>
+</div>
           <div class="flex items-center gap-3">
             <div
               class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
@@ -750,7 +752,7 @@ export class PlayerController extends ScriptComponent {
   </div>
 
   <script src="../../examples.js"></script>
-  <script type="module" src="../../main.js"></script>
+  <script type="module" src="../../demo_games/top-down/index.js"></script>
 
   <script>
     window.addEventListener('load', async () => {
