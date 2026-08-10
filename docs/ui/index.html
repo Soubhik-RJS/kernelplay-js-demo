@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>User Interface — KernelPlay.js</title>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .doc-nav a {
+      display: block;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: #374151;
+      transition: all .2s;
+      text-decoration: none;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .doc-nav a:hover {
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    .doc-nav a.active {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white !important;
+    }
+
+    .copy-btn {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .copy-btn:hover {
+      color: white;
+      background: #374151;
+    }
+
+    .code-wrap {
+      background: #282c34;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: #21252b;
+      border-bottom: 1px solid #3a3f4b;
+    }
+
+    .code-lang {
+      font-size: 0.7rem;
+      color: #5c6370;
+      font-family: monospace;
+    }
+
+    .code-wrap pre {
+      margin: 0;
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .code-wrap pre code.hljs {
+      background: transparent;
+      padding: 0;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .prev-next {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 2px solid #e0e7ff;
+      gap: 16px;
+    }
+
+    .pn-btn {
+      flex: 1;
+      padding: 16px;
+      border-radius: 12px;
+      border: 2px solid #e0e7ff;
+      background: white;
+      cursor: pointer;
+      text-decoration: none;
+      color: #374151;
+      transition: all .2s;
+    }
+
+    .pn-btn:hover {
+      border-color: #6366f1;
+      background: #eef2ff;
+    }
+
+    .pn-btn.next {
+      text-align: right;
+    }
+
+    .pn-label {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .pn-title {
+      font-weight: 700;
+      color: #4f46e5;
+      font-size: 0.95rem;
+    }
+
+    .nav-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 1.5rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid #e0e7ff;
+    }
+
+    .page-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    code.inline {
+      background: #f3f4f6;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      color: #4f46e5;
+    }
+
+    .info-card {
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid;
+      margin-bottom: 16px;
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#6366f1',
+            'secondary': '#8b5cf6',
+            'accent': '#ec4899',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      .gradient-text {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .code-block {
+        background: #1e1e1e;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .doc-nav a {
+        transition: all 0.2s;
+      }
+      
+      .doc-nav a.active {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+      }
+    }
+  </style>
+</head>
+
+<body style="background:linear-gradient(135deg,#eef2ff 0%,#f5f3ff 50%,#fdf2f8 100%);min-height:100vh;">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-indigo-200 shadow-lg">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="index.html" class="flex items-center gap-2 group">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-transform">
+            <span class="text-white font-bold text-xl">K</span>
+          </div>
+          <span class="text-xl font-bold gradient-text hidden sm:inline">KernelPlay.js</span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-8">
+          <a href="../../" class="text-gray-700 hover:text-indigo-600 transition-colors">Home</a>
+          <a href="../../docs" class="text-indigo-600 font-semibold">Docs</a>
+          <a href="../../examples" class="text-gray-700 hover:text-indigo-600 transition-colors">Examples</a>
+          <a href="../../about" class="text-gray-700 hover:text-indigo-600 transition-colors">About</a>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <a href="https://github.com/Soubhik1000/kernelplay" target="_blank"
+            class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            <span class="font-medium">GitHub</span>
+          </a>
+
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-indigo-100 transition-colors">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden border-t border-indigo-200 bg-white/95 backdrop-blur-lg">
+      <div class="container mx-auto px-4 py-4 space-y-3">
+        <a href="../../" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">Home</a>
+        <a href="../../docs" class="block px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 font-semibold">Docs</a>
+        <a href="../../examples"
+          class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">Examples</a>
+        <a href="../../about"
+          class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-indigo-50 transition-colors">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <div style="max-width:1280px;margin:0 auto;padding:88px 24px 60px;display:flex;gap:32px;">
+
+    <aside style="width:240px;flex-shrink:0;">
+      <div class="glass"
+        style="position:sticky;top:84px;border-radius:16px;padding:20px;border:1px solid #e0e7ff;box-shadow:0 4px 20px rgba(99,102,241,.08);">
+        <p
+          style="font-size:0.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">
+          Documentation</p>
+        <nav class="doc-nav">
+          <a href="../getting-started" class="">Getting Started</a>
+          <a href="../core-concepts" class="">Core Concepts</a>
+          <a href="../components" class="">Components</a>
+          <a href="../renderers" class="">Renderers</a>
+          <a href="../physics" class="">Physics</a>
+          <a href="../input" class="">Input System</a>
+          <a href="../helper-classes" class="">Helper Classes</a>
+          <a href="../multiple-cameras" class="">Multiple Cameras Setup</a>
+          <a href="../prop-injection" class="">Prop Injection System</a>
+          <a href="../lifecycle" class="">Script Lifecycle</a>
+          <a href="../animation" class="">Advanced Animation</a>
+          <a href="../ui" class="active">User Interface</a>
+          <a href="../sprites" class="">Sprite Management</a>
+          <a href="../api" class="">API Reference</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main style="flex:1;max-width:860px;">
+      <div class="glass"
+        style="border-radius:20px;padding:48px;border:1px solid #e0e7ff;box-shadow:0 4px 30px rgba(99,102,241,.1);">
+        <h1 class="page-title gradient-text">User Interface</h1>
+        <p style="color:#6b7280;font-size:1.05rem;margin-bottom:32px;">Build interactive UI elements like buttons, text,
+          and progress bars.</p>
+
+        <h2 class="section-title" id="global-theme">Global Theme</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('global-theme-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="global-theme-code" class="language-js">// Override any theme value globally — all elements inherit
+game.ui.theme.set({
+    primaryColor:    "#e63946",
+    fontFamily:      "Press Start 2P, monospace",
+    fontSize:        12,
+    borderRadius:    4,
+    backgroundColor: "#0a0a1a",
+});
+
+// Reset to built-in defaults
+game.ui.theme.reset();</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uipanel">UIPanel — container / background box</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uipanel-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uipanel-code" class="language-js">import { UIPanel } from "kernelplay-js"; // Assuming UIPanel is exported from main library
+
+const panel = game.ui.add(new UIPanel({
+    anchor: "center",
+    offset: { x: 0, y: 0 },
+    width:  300,
+    height: 200,
+    zIndex: 0,
+
+    // per-element style overrides
+    style: {
+        surfaceColor: "#1a1a2e",
+        borderColor:  "#e63946",
+        borderWidth:  2,
+        borderRadius: 12,
+    },
+}));
+
+// hide / show
+panel.visible = false;
+panel.visible = true;</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uitext">UIText — label</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uitext-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uitext-code" class="language-js">import { UIText } from "kernelplay-js"; // Assuming UIText is exported from main library
+
+const label = game.ui.add(new UIText({
+    text:   "Score: 0",
+    anchor: "topLeft",
+    offset: { x: 20, y: 20 },
+    style: {
+        textColor:  "#ffffff",
+        fontSize:   18,
+        fontWeight: "bold",
+    },
+}));
+
+// update text every frame
+label.text = `Score: ${this.score}`;</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uibutton">UIButton — clickable button</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uibutton-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uibutton-code" class="language-js">import { UIButton } from "kernelplay-js"; // Assuming UIButton is exported from main library
+
+const btn = game.ui.add(new UIButton({
+    label:  "Play",
+    anchor: "center",
+    offset: { x: 0, y: 0 },
+    width:  160,
+    height: 48,
+    zIndex: 1,
+    style: {
+        primaryColor: "#4a90e2",
+        hoverColor:   "#5aa0f2",
+        pressColor:   "#3a80d2",
+        fontSize:     16,
+        fontWeight:   "bold",
+    },
+}));
+
+btn.onClick = () => {
+    console.log("Play clicked!");
+    game.sceneManager.startScene("Game");
+};
+
+// disable button
+btn.disabled = true;
+
+// re-enable
+btn.disabled = false;</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uiimage">UIImage — sprite / icon</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiimage-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiimage-code" class="language-js">import { UIImage } from "kernelplay-js"; // Assuming UIImage is exported from main library
+
+const icon = game.ui.add(new UIImage({
+    src:    "./assets/health_icon.png",
+    anchor: "topLeft",
+    offset: { x: 10, y: 10 },
+    width:  32,
+    height: 32,
+}));</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uiprogressbar">UIProgressBar — health bar / loading bar</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiprogressbar-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiprogressbar-code" class="language-js">import { UIProgressBar } from "kernelplay-js"; // Assuming UIProgressBar is exported from main library
+
+const healthBar = game.ui.add(new UIProgressBar({
+    value:     1.0,          // 1.0 = full
+    direction: "left",       // fills left → right
+    anchor:    "topLeft",
+    offset:    { x: 20, y: 20 },
+    width:     200,
+    height:    20,
+    showText:  false,
+    style: {
+        progressTrackColor: "#333350",
+        progressFillColor:  "#e74c3c",   // red health bar
+        borderRadius:       10,
+    },
+}));
+
+// update when player takes damage
+healthBar.setValue(this.health / this.maxHealth);
+
+// other directions
+const chargeBar = game.ui.add(new UIProgressBar({
+    value:     0,
+    direction: "left",     // "left" | "right" | "up" | "down"
+    anchor:    "bottomCenter",
+    offset:    { x: 0, y: 20 },
+    width:     120,
+    height:    12,
+    style: { progressFillColor: "#f39c12" },
+}));
+chargeBar.setValue(this.charge / this.maxCharge);</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uicheckbox">UICheckbox — toggle option</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uicheckbox-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uicheckbox-code" class="language-js">import { UICheckbox } from "kernelplay-js"; // Assuming UICheckbox is exported from main library
+
+const sfxToggle = game.ui.add(new UICheckbox({
+    label:   "Sound Effects",
+    checked: true,
+    anchor:  "center",
+    offset:  { x: 0, y: -20 },
+    width:   200,
+    height:  30,
+}));
+
+sfxToggle.onChange = (checked) => {
+    game.audio.setSFXVolume(checked ? 1 : 0);
+};</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uislider">UISlider — volume / sensitivity control</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uislider-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uislider-code" class="language-js">import { UISlider } from "kernelplay-js"; // Assuming UISlider is exported from main library
+
+const volumeSlider = game.ui.add(new UISlider({
+    value:     0.8,
+    min:       0,
+    max:       1,
+    showValue: true,
+    anchor:    "center",
+    offset:    { x: 0, y: 40 },
+    width:     220,
+    height:    30,
+}));
+
+volumeSlider.onChange = (value) => {
+    game.audio.setMasterVolume(value);
+};</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uiinputfield">UIInputField — text input</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiinputfield-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiinputfield-code" class="language-js">import { UIInputField } from "kernelplay-js"; // Assuming UIInputField is exported from main library
+
+const nameField = game.ui.add(new UIInputField({
+    placeholder: "Enter your name...",
+    value:       "",
+    maxLength:   20,
+    anchor:      "center",
+    offset:      { x: 0, y: 0 },
+    width:       260,
+    height:      42,
+}));
+
+nameField.onChange  = (value) => console.log("Typing:", value);
+nameField.onSubmit  = (value) => {
+    console.log("Name submitted:", value);
+    savePlayerName(value);
+};
+
+// password field
+const passField = game.ui.add(new UIInputField({
+    placeholder: "Password",
+    password:    true,
+    anchor:      "center",
+    offset:      { x: 0, y: 60 },
+    width:       260,
+    height:      42,
+}));</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uiimagebutton">UIImageButton — three modes</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiimagebutton-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiimagebutton-code" class="language-js">// 1. Image background + label (menu button with art)
+import { UIImageButton } from "kernelplay-js"; // Assuming UIImageButton is exported from main library
+new UIImageButton({ src: "./assets/btn.png", label: "Play" })
+
+// 2. Icon only — label: null
+new UIImageButton({ src: "./assets/settings_icon.png", label: null })
+
+// 3. Sprite sheet states — different region per state
+new UIImageButton({
+    src: "./assets/btn_sheet.png",
+    states: {
+        normal:   { x: 0,   y: 0, w: 160, h: 60 },
+        hover:    { x: 160, y: 0, w: 160, h: 60 },
+        press:    { x: 320, y: 0, w: 160, h: 60 },
+        disabled: { x: 480, y: 0, w: 160, h: 60 },
+    }
+})</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uibitmaptext">UIBitmapText</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uibitmaptext-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uibitmaptext-code" class="language-js">import { UIBitmapText } from "kernelplay-js"; // Assuming UIBitmapText is exported from main library
+const score = game.ui.add(new UIBitmapText({
+    src:        "./assets/font.png",
+    text:       "SCORE: 0",
+    charWidth:  8,       // one char cell on sheet
+    charHeight: 8,
+    sheetCols:  16,      // chars per row on sheet
+    charOffset: 32,      // ASCII 32 = space = first char
+    scale:      3,       // render 3x bigger
+    spacing:    1,
+    anchor:     "topLeft",
+    offset:     { x: 20, y: 20 },
+    tint:       "#ffdd00",  // optional color tint
+}));
+
+// update text
+score.setText(`SCORE: ${this.score}`);
+
+// change tint at runtime
+score.setTint("#ff0000");
+score.clearTint();</code></pre>
+        </div>
+
+        <h2 class="section-title" id="world-space-ui">World Space UI — label above an enemy</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('world-space-ui-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="world-space-ui-code" class="language-js">import { UIText } from "kernelplay-js"; // Assuming UIText is exported from main library
+
+// screenSpace: false → position is in world coords, moves with camera
+const nameTag = game.ui.add(new UIText({
+    text:        "Boss",
+    screenSpace: false,
+    offset:      { x: enemy.transform.position.x, y: enemy.transform.position.y - 60 },
+    style: { textColor: "#e74c3c", fontSize: 12 },
+}));
+
+// update world position every frame in your script
+update(dt) {
+    nameTag.offset.x = this.transform.position.x;
+    nameTag.offset.y = this.transform.position.y - 60;
+}</code></pre>
+        </div>
+
+        <h2 class="section-title" id="uiraycast">UIRaycast — skip game input when UI is hit</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiraycast-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiraycast-code" class="language-js">// In your game's input handling — check UI first
+import { Mouse, MouseButton } from "kernelplay-js";
+update(dt) {
+    if (Mouse.wasPressed(MouseButton.Left)) {
+        // don't fire game raycast if UI consumed the click
+        if (game.ui.raycast.isUIAt(Mouse.x, Mouse.y)) return;
+
+        const hit = this.raycast(worldPos.x, worldPos.y);
+        if (hit) console.log("Hit:", hit.entity.name);
+    }
+}</code></pre>
+        </div>
+
+        <h2 class="section-title" id="find-elements">Find elements by name</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('find-elements-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="find-elements-code" class="language-js">// find by name set in constructor
+const btn = game.ui.find("UIButton");
+
+// update it
+btn.label   = "Restart";
+btn.onClick = () => restartGame();
+
+// remove it
+game.ui.remove(btn);
+
+// clear all UI
+game.ui.clear();</code></pre>
+        </div>
+
+        <h2 class="section-title" id="full-hud-example">Full HUD example — health + score + pause button</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('full-hud-example-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="full-hud-example-code" class="language-js">import { UIText, UIProgressBar, UIButton, UIPanel } from "kernelplay-js"; // Assuming these are exported from main library
+
+class HUD {
+    constructor(game) {
+        this.ui = game.ui;
+
+        // health bar
+        this.healthBar = this.ui.add(new UIProgressBar({
+            anchor: "topLeft",
+            offset: { x: 20, y: 20 },
+            width:  200,
+            height: 18,
+            style:  { progressFillColor: "#e74c3c" },
+        }));
+
+        // health label
+        this.ui.add(new UIText({
+            text:   "HP",
+            anchor: "topLeft",
+            offset: { x: 20, y: 48 },
+            style:  { fontSize: 11, textColor: "#aaaacc", textAlign: "left" },
+        }));
+
+        // score
+        this.scoreLabel = this.ui.add(new UIText({
+            text:   "Score: 0",
+            anchor: "topRight",
+            offset: { x: 20, y: 20 },
+            style:  { fontSize: 16, fontWeight: "bold", textAlign: "right" },
+        }));
+
+        // pause button
+        const pauseBtn = this.ui.add(new UIButton({
+            label:  "⏸",
+            anchor: "topRight",
+            offset: { x: 20, y: 60 },
+            width:  40,
+            height: 40,
+            zIndex: 5,
+        }));
+        pauseBtn.onClick = () => game.paused = !game.paused;
+    }
+
+    update(player) {
+        this.healthBar.setValue(player.health / player.maxHealth);
+        this.scoreLabel.text = `Score: ${player.score}`;
+    }
+}</code></pre>
+        </div>
+
+        <h2 class="section-title" id="anchor-reference">Anchor reference</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">text</span>
+            <button class="copy-btn" onclick="copyCode('anchor-reference-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="anchor-reference-code" class="language-text">"topLeft"       "topCenter"       "topRight"
+"middleLeft"    "center"          "middleRight"
+"bottomLeft"    "bottomCenter"    "bottomRight"</code></pre>
+        </div>
+        <p style="color:#374151;margin-top:12px;margin-bottom:12px;"><code class="inline">offset: { x, y }</code> —
+          pixel offset from that anchor point inward.</p>
+
+        <h2 class="section-title" id="file-structure">File structure</h2>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">text</span>
+            <button class="copy-btn" onclick="copyCode('file-structure-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="file-structure-code" class="language-text">src/ui/
+  index.js          ← single import for everything
+  UICanvas.js       ← main manager, creates overlay canvas
+  UITheme.js        ← global stylesheet
+  UIElement.js      ← base class
+  UIRaycast.js      ← separate input system
+  UIElements.js     ← UIPanel, UIText, UIButton, UIImage,
+                       UIProgressBar, UICheckbox, UISlider, UIInputField</code></pre>
+        </div>
+
+        <div class="prev-next">
+          <a href="../animation" class="pn-btn"><span class="pn-label">← Previous</span><span class="pn-title">Advanced
+              Animation</span></a>
+          <a href="../sprites" class="pn-btn next"><span class="pn-label">Next →</span><span class="pn-title">Sprite
+              Management</span></a>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../script.js"></script>
+</body>
+
+</html>
