@@ -428,20 +428,29 @@
               index.html
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="main">
-              main.js
+              index.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="scene">
-              scenes/Level1.js
+              scenes/Main.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="camera">
+              prefabs/Camera.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="player">
               prefabs/Player.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="box">
-              prefabs/Box.js
+              prefabs/Object.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="clips">
+              animation/clips/player_clips.js
+            </button>
+            <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap" data-file="stats">
+              animation/stats/PlayerAnimatorController.js
             </button>
             <button class="code-tab px-4 py-2 rounded-t-lg text-sm font-medium whitespace-nowrap"
               data-file="playercontroller">
-              script/PlayerController.js
+              script/PlayerScript.js
             </button>
 
           </div>
@@ -450,27 +459,33 @@
 
             <div class="code-file hidden" data-file="main">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">main.js</span>
+                <span class="text-xs text-gray-400">index.js</span>
                 <button onclick="copyCodeFile(event, 'main-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
               <pre class="p-4"><code id="main-code" class="language-javascript">import { Game } from "kernelplay-js";
-import { Level1 } from "./scenes/Level1.js";
+import { Main } from "./scene/Main.js";
 
 class MyGame extends Game {
   init() {
-    this.sceneManager.addScene(new Level1("Level1"));
-    this.sceneManager.startScene("Level1");
+    this.sceneManager.addScene(new Main("Main"));
+    this.sceneManager.startScene("Main");
   }
 }
 
-const game = new MyGame({
-  width: 800,
-  height: 600,
-  fps: 60
+const game = new MyGame({ 
+  width: 800, 
+  height: 600, 
+  fps: 60 ,
+  // debugPhysics: true,
 });
+
+await game.audio.loadAll([
+    './assets/jump.mp3',
+    './assets/run.mp3',
+]);
 
 game.start();</code></pre>
             </div>
@@ -504,45 +519,60 @@ game.start();</code></pre>
 
             <div class="code-file hidden" data-file="scene">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">Level1.js</span>
+                <span class="text-xs text-gray-400">Main.js</span>
                 <button onclick="copyCodeFile(event, 'scene-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
               <pre class="p-4"><code id="scene-code" class="language-javascript">import { Scene } from "kernelplay-js";
-import { Player } from "../prefabs/Player.js";
-import { Box } from "../prefabs/Box.js";
-import { Entity, TransformComponent, CameraComponent } from "kernelplay-js";
-
-export class Level1 extends Scene {
+import { Camera } from "../prefabes/Camera.js";
+import { Player } from "../prefabes/Player.js";
+import { Object } from "../prefabes/Object.js";
+ 
+export class Main extends Scene {
   init() {
-    const player = new Player(400, 100);
+    this.addEntity(new Camera(400, 300, this.game.config.width, this.game.config.height));
+    this.addEntity(new Player(400, 200));
 
-    const camera = new Entity("MainCamera");
-    camera.id = 100;
-    camera.addComponent("transform", new TransformComponent({
-      position: { x: 400, y: 300, z: 10 }
-    }));
-    camera.addComponent("camera", new CameraComponent({
-      width: 800,
-      height: 600,
-      isPrimary: true,
-      target: player,
-    }));
-
-    this.addEntity(camera);
-    this.addEntity(player);
-
-    this.addEntity(new Box(400, 300, "Wall"));
-    this.addEntity(new Box(650, 370, "Wall"));
-    this.addEntity(new Box(650, 170, "Wall"));
-    this.addEntity(new Box(150, 170, "Wall"));
-    this.addEntity(new Box(150, 360, "Wall"));
-
-    this.addEntity(new Box(650, 120, "Coin"));
-    this.addEntity(new Box(150, 315, "Coin"));
+    this.spawn(Object, 100, 400, "tree");
+    this.spawn(Object, 400, 300, "rock");
+    this.spawn(Object, 700, 200, "tree");
+    this.spawn(Object, 100, 200, "rock");
+    this.spawn(Object, 700, 500, "tree");
   }
+}</code></pre>
+            </div>
+
+            <div class="code-file hidden" data-file="camera">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">Player.js</span>
+                <button onclick="copyCodeFile(event, 'player-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="player-code" class="language-javascript">import { Entity, TransformComponent, CameraComponent, AudioListener } from "kernelplay-js";
+
+export class Camera extends Entity {
+    constructor(x, y, width, height) {
+        super("Camera");
+
+        this.tag = "camera";
+
+        this.addComponent("transform", new TransformComponent({
+            position: { x: x, y: y, z: 0 }
+        }));
+
+        this.addComponent("audioListener", new AudioListener());
+
+        this.addComponent("camera", new CameraComponent({
+            width: width,
+            height: height,
+            isPrimary: true
+        }));
+
+    }
 }</code></pre>
             </div>
 
@@ -554,147 +584,292 @@ export class Level1 extends Scene {
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="player-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-    Rigidbody2DComponent
-} from "kernelplay-js";
-
-import { PlayerController } from "../scripts/PlayerController.js";
-import { Layers } from "kernelplay-js";
+              <pre class="p-4"><code id="player-code" class="language-javascript">import { Entity, TransformComponent, SpriteComponent, ColliderComponent, Rigidbody2DComponent, AnimatorComponent, AudioSource } from "kernelplay-js";
+import { PlayerScript } from "../Script/PlayerScript.js";
+import { PlayerAnimatorController } from "../animation/stats/PlayerAnimatorController.js";
 
 export class Player extends Entity {
     constructor(x, y) {
         super("Player");
-
-        this.layer = Layers.Player;
-        this.tag = "player"
+        this.tag = "player";
 
         this.addComponent("transform", new TransformComponent({
-            position: { x, y },
+            position: { x: x, y: y },
+            scale: { x: 1.4, y: 1.4 }
         }));
-        this.addComponent("rigidbody2d",new Rigidbody2DComponent({
+
+        this.addComponent("rigidbody2d", new Rigidbody2DComponent({
+            useGravity: false,
             mass: 1,
-            gravityScale: 1
+            drag: 0.02
         }));
-        this.addComponent("collider", new ColliderComponent());
-        this.addComponent("renderer", new BoxRenderComponent("red"));
-        this.addComponent("playerController", new PlayerController());
+
+        this.addComponent("collider", new ColliderComponent({ width: 20, height: 45 }));
+
+        this.addComponent("renderer", new SpriteComponent({
+            image: "./assets/player_sheet.png",
+            sourceWidth: 64,
+            sourceHeight: 64,
+            width: 50,
+            height: 50,
+            anchor: { x: 0.5, y: 0.5 },
+            zIndex: 10,
+        }));
+
+        this.addComponent("animator", new AnimatorComponent({ controller: PlayerAnimatorController() }));
+        this.addComponent("audio", new AudioSource({
+            clips: {
+                run: './assets/run.mp3',
+                jump: './assets/jump.mp3',
+            },
+            volume: 1.0,
+        }));
+
+        this.addComponent("script", new PlayerScript({
+            speed: 200,
+            force: 500,
+        }));
     }
 }</code></pre>
             </div>
 
             <div class="code-file hidden" data-file="box">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">Box.js</span>
+                <span class="text-xs text-gray-400">Object.js</span>
                 <button onclick="copyCodeFile(event, 'box-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="box-code" class="language-javascript">import {
-    Entity,
-    TransformComponent,
-    ColliderComponent,
-    BoxRenderComponent,
-} from "kernelplay-js";
+              <pre class="p-4"><code id="box-code" class="language-javascript">import { TransformComponent, SpriteComponent, ColliderComponent } from "kernelplay-js";
 
-export class Box extends Entity {
-    constructor(x, y, name="Wall") {
+export function Object(entity, x, y, skin = "tree") {
+    entity.name = "Platform";
+    entity.tag = "platform";
 
-        super(name);
-        this.tag = name.toLowerCase();
-        this.zIndex = -1;
-        
-        switch (name) {
-            case "Wall":
-                this.addComponent("transform", new TransformComponent({
-                    position: { x, y },
-                    scale: {x: 3, y: 1}
-                }));
-                this.addComponent("collider", new ColliderComponent({isTrigger:false}));
-                this.addComponent("renderer", new BoxRenderComponent({color:"#135800"}));
-                break;
-        
-            case "Coin":
-                this.addComponent("transform", new TransformComponent({
-                    position: { x, y },
-                    scale: {x: 0.4, y: 0.4}
-                }));
-                this.addComponent("collider", new ColliderComponent({isTrigger:true}));
-                this.addComponent("renderer", new BoxRenderComponent({color:"#ffea00"}));
-                break;
-        }
-    }
-}
-</code></pre>
+    entity.addComponent("transform", new TransformComponent({
+        position: { x: x, y: y },
+        scale: { x: 2.3, y: 2.3 }
+    }));
+
+    entity.addComponent("collider", new ColliderComponent({
+        isTrigger: false,   // true = trigger events only, no physics push
+        offset: { x: 0, y: 0 }
+    }));
+
+    entity.addComponent("renderer", new SpriteComponent({
+        image: skin == "tree" ? "./assets/tree.png" : "./assets/rock.png",
+        // sourceWidth: 1000,
+        // sourceHeight: 250,
+        width: 50,
+        height: 50,
+        anchor: { x: 0.5, y: 0.5 },
+        zIndex: 10,
+    }));
+}</code></pre>
             </div>
 
-            <div class="code-file hidden" data-file="playercontroller">
+            <div class="code-file hidden" data-file="clips">
               <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-                <span class="text-xs text-gray-400">PlayerController.js</span>
+                <span class="text-xs text-gray-400">player_clips.js</span>
                 <button onclick="copyCodeFile(event, 'script-code')"
                   class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
                   Copy
                 </button>
               </div>
-              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, Mouse, Layers } from "kernelplay-js";
+              <pre class="p-4"><code id="script-code" class="language-javascript">import { AnimationClip } from "kernelplay-js";
 
-export class PlayerController extends ScriptComponent {
-    onStart(){
-        this.pos = this.entity.getComponent("transform").position;
-    }
+export const idleClip = new AnimationClip({
+    name: "idle",
+    frames: [0, 2],
+    frameRate: 2,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 
-    update(dt) {
-        const rb = this.entity.getComponent("rigidbody2d");
+export const idleDown = new AnimationClip({ name: "idleDown", frames: [0], frameRate: 1, loop: true, gridWidth: 4, frameWidth: 64, frameHeight: 64 });
+export const idleRight = new AnimationClip({ name: "idleRight", frames: [8], frameRate: 1, loop: true, gridWidth: 4, frameWidth: 64, frameHeight: 64 });
+export const idleUp = new AnimationClip({ name: "idleUp", frames: [12], frameRate: 1, loop: true, gridWidth: 4, frameWidth: 64, frameHeight: 64 });
+export const idleLeft = new AnimationClip({ name: "idleLeft", frames: [4], frameRate: 1, loop: true, gridWidth: 4, frameWidth: 64, frameHeight: 64 });
 
-        rb.velocity.x = 0;
-        // rb.velocity.y = 0;
 
-        if (Keyboard.isPressed("ArrowRight")) rb.velocity.x = 200;
-        if (Keyboard.isPressed("ArrowLeft")) rb.velocity.x = -200;
-        if (Keyboard.isPressed("ArrowUp")) rb.velocity.y = -200;
-        if (Keyboard.isPressed("ArrowDown")) rb.velocity.y = 200;
+export const walkClip = new AnimationClip({
+    name: "walk",
+    frames: [8, 9, 10, 11],
+    frameRate: 6,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 
-        if (Mouse.wasPressed(0)) {
-            const hit = this.entity.scene.raycast(Mouse.x, Mouse.y, {
-                layerMask: Layers.Player
-            });
+export const walkClipDown = new AnimationClip({
+    name: "walkDown",
+    frames: [1, 2, 3],
+    frameRate: 6,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 
-            console.log("Hit (Player layer only):", hit?.entity?.tag);
-        }
+export const walkClipRight = new AnimationClip({
+    name: "walkRight",
+    frames: [9, 10, 11],
+    frameRate: 6,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 
-        if (rb.isGrounded) {
-            if (Keyboard.isPressed(" ")) {
-                rb.addForce(0, -600, "impulse");
-                this.isGround = false;
-            }
-        }
+export const walkClipLeft = new AnimationClip({
+    name: "walkLeft",
+    frames: [5, 6, 7],
+    frameRate: 6,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 
-        if(this.pos.x > 1000, this.pos.y > 1000) {
-            this.pos.x = 400;
-            this.pos.y = 100;
-        }
-    }
-
-    // onCollision(other) {
-    //     // Called when a solid collision occurs
-    //     console.log("Player hit:", other.name);
-    // }
-
-    onTriggerEnter(other) {
-        // Called when entering a trigger collider
-        // console.log("Player entered trigger:", other.tag);
-        if (other.tag === "coin") {
-            other.destroy();
-            console.log("Coin collected !!!");
-            
-        }
-    }
-}
+export const walkClipUp = new AnimationClip({
+    name: "walkUp",
+    frames: [13, 14, 15],
+    frameRate: 6,
+    loop: true,
+    gridWidth: 4,
+    frameWidth: 64,
+    frameHeight: 64,
+});
 </code></pre>
+            </div>
+
+            <div class="code-file hidden" data-file="stats">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">PlayerAnimatorController.js</span>
+                <button onclick="copyCodeFile(event, 'script-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="script-code" class="language-javascript">import { AnimatorController } from "kernelplay-js";
+import { idleDown, idleRight, idleUp, idleLeft, walkClipDown, walkClipUp, walkClipRight, walkClipLeft } from "../clips/player_clips.js";
+
+export function PlayerAnimatorController() {
+
+    return new AnimatorController()
+
+        // --- PARAMETERS ---
+        .addParameter("speedX", "float", 0)
+        .addParameter("speedY", "float", 0)
+        .addParameter("isAttacking", "bool", false)
+
+        // --- STATES ---
+        .addState("idleDown", idleDown)
+        .addState("idleUp", idleUp)
+        .addState("idleRight", idleRight)
+        .addState("idleLeft", idleLeft)
+        .addState("walkDown", walkClipDown)
+        .addState("walkUp", walkClipUp)
+        .addState("walkRight", walkClipRight)
+        .addState("walkLeft", walkClipLeft)
+
+        // --- TRANSITIONS: WALK -> IDLE ---
+        .addTransition("walkRight", "idleRight", {
+            conditions: [{ param: "speedX", op: "<=", value: 0.1 }],
+            hasExitTime: false, duration: 0
+        })
+        .addTransition("walkLeft", "idleLeft", {
+            conditions: [{ param: "speedX", op: ">=", value: -0.1 }],
+            hasExitTime: false, duration: 0
+        })
+        .addTransition("walkDown", "idleDown", {
+            conditions: [{ param: "speedY", op: "<=", value: 0.1 }],
+            hasExitTime: false, duration: 0
+        })
+        .addTransition("walkUp", "idleUp", {
+            conditions: [{ param: "speedY", op: ">=", value: -0.1 }],
+            hasExitTime: false, duration: 0
+        })
+
+        // --- TRANSITIONS: IDLE -> WALK ---
+        .addTransition("idleDown", "walkRight", { conditions: [{ param: "speedX", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleUp", "walkRight", { conditions: [{ param: "speedX", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleLeft", "walkRight", { conditions: [{ param: "speedX", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleRight", "walkRight", { conditions: [{ param: "speedX", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+
+        .addTransition("idleDown", "walkLeft", { conditions: [{ param: "speedX", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleUp", "walkLeft", { conditions: [{ param: "speedX", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleLeft", "walkLeft", { conditions: [{ param: "speedX", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+        .addTransition("idleRight", "walkLeft", { conditions: [{ param: "speedX", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 2 })
+
+        .addTransition("idleDown", "walkDown", { conditions: [{ param: "speedY", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleUp", "walkDown", { conditions: [{ param: "speedY", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleLeft", "walkDown", { conditions: [{ param: "speedY", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleRight", "walkDown", { conditions: [{ param: "speedY", op: ">", value: 0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+
+        .addTransition("idleDown", "walkUp", { conditions: [{ param: "speedY", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleUp", "walkUp", { conditions: [{ param: "speedY", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleLeft", "walkUp", { conditions: [{ param: "speedY", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+        .addTransition("idleRight", "walkUp", { conditions: [{ param: "speedY", op: "<", value: -0.1 }], hasExitTime: false, duration: 0, priority: 1 })
+}</code></pre>
+            </div>
+
+            <div class="code-file hidden" data-file="playercontroller">
+              <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                <span class="text-xs text-gray-400">PlayerScript.js</span>
+                <button onclick="copyCodeFile(event, 'script-code')"
+                  class="text-xs text-gray-400 hover:text-white px-3 py-1 rounded hover:bg-gray-700">
+                  Copy
+                </button>
+              </div>
+              <pre class="p-4"><code id="script-code" class="language-javascript">import { ScriptComponent, Keyboard, KeyCode } from "kernelplay-js";
+
+export class PlayerScript extends ScriptComponent {
+  onStart() {
+    this.animator = this.entity.getComponent("animator");
+    this.sprite = this.entity.getComponent("renderer");
+    this.rb = this.entity.getComponent("rigidbody2d");
+    this.transform = this.entity.getComponent("transform");
+    this.audio = this.entity.getComponent("audio");
+  }
+
+  start() {
+    super.start();
+    this.camera.setTarget(this.entity);
+  }
+
+  update(dt) {
+    this.rb.velocity.x = 0;
+    this.rb.velocity.y = 0;
+
+    if (Keyboard.isPressed(KeyCode.D) || Keyboard.isPressed("ArrowRight")) {
+      this.rb.velocity.x = this.speed;
+    } else if (Keyboard.isPressed(KeyCode.A) || Keyboard.isPressed("ArrowLeft")) {
+      this.rb.velocity.x = -this.speed;
+    }
+
+    if (Keyboard.isPressed(KeyCode.W) || Keyboard.isPressed("ArrowUp")) {
+      this.rb.velocity.y = -this.speed;
+    } else if (Keyboard.isPressed(KeyCode.S) || Keyboard.isPressed("ArrowDown")) {
+      this.rb.velocity.y = this.speed;
+    }
+
+    const isMoving = this.rb.velocity.x !== 0 || this.rb.velocity.y !== 0;
+    if (isMoving) {
+      this.audio.playLoop('run', { volume: 0.5 });
+    } else {
+      this.audio.stopLoop('run');
+    }
+
+    this.animator.setParameter("speedX", this.rb.velocity.x);
+        this.animator.setParameter("speedY", this.rb.velocity.y);
+
+  }
+}</code></pre>
             </div>
 
           </div>
