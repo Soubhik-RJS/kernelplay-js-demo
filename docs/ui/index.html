@@ -721,6 +721,53 @@ update(dt) {
 }</code></pre>
         </div>
 
+        <h2 class="section-title" id="uiraycast">UILayers</h2>
+        <h3 class="section-title" id="uiraycast">Default layers — always available, never need to create them:
+</h3>
+<div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiraycast-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiraycast-code" class="language-js">"World"   order: 0   — world space UI (damage numbers, name tags)
+"HUD"     order: 10  — health bars, score, ammo
+"Menu"    order: 20  — pause menu, settings
+"Overlay" order: 30  — fades, popups, loading screens</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header">
+            <span class="code-lang">js</span>
+            <button class="copy-btn" onclick="copyCode('uiraycast-code')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-width="2" />
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre><code id="uiraycast-code" class="language-js">// default layers — no setup needed
+game.ui.add(new UIProgressBar({ ... }), "HUD");
+game.ui.add(new UIButton({ ... }),      "Menu");
+game.ui.add(new UIText({ ... }),        "Overlay");
+
+// custom layer
+game.ui.addLayer("Minimap", 5);
+game.ui.add(new UIImage({ ... }), "Minimap");
+
+// control layers
+game.ui.hideLayer("Menu");
+game.ui.showLayer("Menu");
+game.ui.lockLayer("HUD");      // HUD visible but not clickable
+game.ui.toggleLayer("Menu");   // pause menu open/close
+</code></pre>
+        </div>
+
         <h2 class="section-title" id="uiraycast">UIRaycast — skip game input when UI is hit</h2>
         <div class="code-wrap">
           <div class="code-header">
