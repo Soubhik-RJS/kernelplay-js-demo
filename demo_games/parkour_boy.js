@@ -11,7 +11,7 @@
 //
 // -----------------------------------------------------------------------------
 
-import { BoxRenderComponent, Entity, Game, Random, ref, Scene, UIText, UIButton, UIPanel } from "../../src/index.js";
+import { BoxRenderComponent, Entity, Game, Random, ref, Scene, UIText, UIButton, UIPanel } from "kernelplay-js";
 import {
     TransformComponent,
     CameraComponent,
@@ -23,9 +23,9 @@ import {
     AudioSource,
     Gamepad
 } from "../../src/index.js";
-import { AnimatorComponent, AnimatorController, AnimationClip } from "../../src/index.js";
-import { Keyboard, KeyCode } from "../../src/index.js";
-import { Mathf, Vector2, degToRad } from "../../src/index.js";
+import { AnimatorComponent, AnimatorController, AnimationClip } from "kernelplay-js";
+import { Keyboard, KeyCode } from "kernelplay-js";
+import { Mathf, Vector2, degToRad } from "kernelplay-js";
 
 // This is player animation controller, which defines the animation states and transitions based on parameters set by the PlayerScript.
 function PlayerAnimatorController() {
