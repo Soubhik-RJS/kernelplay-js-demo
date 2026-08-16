@@ -882,7 +882,8 @@ const game = new MyGame({
     height: 600,
     fps: 60,
     backgroundColor: "#eeeeee",
-    // debugPhysics: true
+    // debugPhysics: true,
+    container: "#canvas-container",
 });
 
 await game.audio.loadAll([
