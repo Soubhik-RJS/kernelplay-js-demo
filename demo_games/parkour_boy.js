@@ -22,7 +22,7 @@ import {
     AudioListener,
     AudioSource,
     Gamepad
-} from "../../src/index.js";
+} from "kernelplay-js";
 import { AnimatorComponent, AnimatorController, AnimationClip } from "kernelplay-js";
 import { Keyboard, KeyCode } from "kernelplay-js";
 import { Mathf, Vector2, degToRad } from "kernelplay-js";
