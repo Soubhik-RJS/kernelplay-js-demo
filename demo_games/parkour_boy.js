@@ -11,7 +11,7 @@
 //
 // -----------------------------------------------------------------------------
 
-import { BoxRenderComponent, Entity, Game, Random, ref, Scene, UIText, UIButton, UIPanel } from "kernelplay-js";
+import { BoxRenderComponent, Entity, Game, Random, ref, Scene, UIText, UIButton, UIPanel } from "../../src/index.js";
 import {
     TransformComponent,
     CameraComponent,
@@ -20,11 +20,12 @@ import {
     ScriptComponent,
     ColliderComponent,
     AudioListener,
-    AudioSource
-} from "kernelplay-js";
-import { AnimatorComponent, AnimatorController, AnimationClip } from "kernelplay-js";
-import { Keyboard, KeyCode } from "kernelplay-js";
-import { Mathf, Vector2, degToRad } from "kernelplay-js";
+    AudioSource,
+    Gamepad
+} from "../../src/index.js";
+import { AnimatorComponent, AnimatorController, AnimationClip } from "../../src/index.js";
+import { Keyboard, KeyCode } from "../../src/index.js";
+import { Mathf, Vector2, degToRad } from "../../src/index.js";
 
 // This is player animation controller, which defines the animation states and transitions based on parameters set by the PlayerScript.
 function PlayerAnimatorController() {
@@ -200,16 +201,52 @@ class PlayerScript extends ScriptComponent {
         this.isLose = false;
     }
 
+    // update(dt) {
+    //     if (this.isLose) return;
+
+    //     this.rb.velocity.x = 0;
+
+    //     if (Keyboard.isPressed(KeyCode.ArrowRight)) {
+    //         this.rb.velocity.x = this.speed;
+    //         this.sprite.flipX = false;
+    //     }
+    //     if (Keyboard.isPressed(KeyCode.ArrowLeft)) {
+    //         this.rb.velocity.x = -this.speed;
+    //         this.sprite.flipX = true;
+    //     }
+
+    //     const isMoving = this.rb.velocity.x !== 0;
+    //     this.animator.setParameter("speed", isMoving ? 1 : 0);
+    //     this.animator.setParameter("isGrounded", this.rb.isGrounded);
+
+    //     if (this.rb.isGrounded && Keyboard.wasPressed(KeyCode.Space)) {
+    //         this.rb.addForce(0, -600, "impulse");
+    //         this.audio.stopLoop('run');          // cut run sound immediately
+    //         this.audio.playOneShot('jump', { volume: 0.1 });
+    //         this.animator.setTrigger("jump");
+    //     }
+
+    //     this.transform.position.x = Mathf.clamp(this.transform.position.x, -710, 710)
+
+    //     if (isMoving && this.rb.isGrounded) {
+    //         this.audio.playLoop('run', { volume: 0.5 });
+    //     } else {
+    //         this.audio.stopLoop('run');
+    //     }
+    // }
+
     update(dt) {
         if (this.isLose) return;
 
         this.rb.velocity.x = 0;
 
-        if (Keyboard.isPressed(KeyCode.ArrowRight)) {
+        const stick = Gamepad.leftStick();
+
+        if (Keyboard.isPressed(KeyCode.ArrowRight) || Gamepad.isPressed(GamepadButton.DPadRight) || stick.x > 0.1) {
             this.rb.velocity.x = this.speed;
             this.sprite.flipX = false;
         }
-        if (Keyboard.isPressed(KeyCode.ArrowLeft)) {
+        if (Keyboard.isPressed(KeyCode.ArrowLeft) || Gamepad.isPressed(GamepadButton.DPadLeft) || stick.x < -0.1) {
             this.rb.velocity.x = -this.speed;
             this.sprite.flipX = true;
         }
@@ -218,14 +255,14 @@ class PlayerScript extends ScriptComponent {
         this.animator.setParameter("speed", isMoving ? 1 : 0);
         this.animator.setParameter("isGrounded", this.rb.isGrounded);
 
-        if (this.rb.isGrounded && Keyboard.wasPressed(KeyCode.Space)) {
+        if (this.rb.isGrounded && (Keyboard.wasPressed(KeyCode.Space) || Gamepad.wasPressed(GamepadButton.A))) {
             this.rb.addForce(0, -600, "impulse");
-            this.audio.stopLoop('run');          // cut run sound immediately
+            this.audio.stopLoop('run');
             this.audio.playOneShot('jump', { volume: 0.1 });
             this.animator.setTrigger("jump");
         }
 
-        this.transform.position.x = Mathf.clamp(this.transform.position.x, -710, 710)
+        this.transform.position.x = Mathf.clamp(this.transform.position.x, -710, 710);
 
         if (isMoving && this.rb.isGrounded) {
             this.audio.playLoop('run', { volume: 0.5 });
@@ -810,6 +847,20 @@ class Level extends Scene {
             this.scoreText.visible = false;
             this.restarBtn.visible = true;
         }
+
+        // Renders the FPS counter and player score on the screen using the canvas
+        // context. The drawing state is preserved using save() and restore() to
+        // prevent side effects on other rendering operations.
+        // this.ctx.save();
+        // this.ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        // this.ctx.font = "20px monospace";
+        // this.ctx.fillText(`FPS: ${this.fps}`, 715, 20);
+
+        // this.ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        // this.ctx.font = "20px monospace";
+        // this.ctx.fillText(`Score: ${this.score}`, 10, 20);
+
+        // this.ctx.restore();
     }
 }
 
@@ -832,7 +883,6 @@ const game = new MyGame({
     fps: 60,
     backgroundColor: "#eeeeee",
     // debugPhysics: true
-    container: "#canvas-container",
 });
 
 await game.audio.loadAll([
