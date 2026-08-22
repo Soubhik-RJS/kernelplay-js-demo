@@ -27,6 +27,39 @@ import { AnimatorComponent, AnimatorController, AnimationClip } from "kernelplay
 import { Keyboard, KeyCode } from "kernelplay-js";
 import { Mathf, Vector2, degToRad } from "kernelplay-js";
 
+export const GamepadButton = {
+  // Face buttons (Xbox layout)
+  A: 0,
+  B: 1,
+  X: 2,
+  Y: 3,
+
+  // Bumpers
+  LB: 4,
+  RB: 5,
+
+  // Triggers (digital)
+  LT: 6,
+  RT: 7,
+
+  // Center buttons
+  Select: 8,
+  Start:  9,
+
+  // Stick clicks
+  LS: 10,
+  RS: 11,
+
+  // D-Pad
+  DPadUp:    12,
+  DPadDown:  13,
+  DPadLeft:  14,
+  DPadRight: 15,
+
+  // Home
+  Home: 16,
+};
+
 // This is player animation controller, which defines the animation states and transitions based on parameters set by the PlayerScript.
 function PlayerAnimatorController() {
     const idleClip = new AnimationClip({
